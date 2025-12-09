@@ -16,7 +16,7 @@
     "@aptos-labs/ts-sdk": "^5.1.5",
     "@arcium-hq/client": "^0.5.1",
     "@coingecko/cryptoformat": "^0.8.2",
-    "@coral-xyz/anchor": "^0.32.1",
+    "@coral-xyz/anchor": "^0.28.0",
     "@dynamic-labs/ethereum": "^3.1.0",
     "@dynamic-labs/ethers-v6": "^3.1.1",
     "@dynamic-labs/sdk-react-core": "^3.1.0",

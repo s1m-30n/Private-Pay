@@ -34,6 +34,35 @@ import {
   Info,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import * as anchor from "@coral-xyz/anchor";
+import { randomBytes } from "crypto";
+import { useArciumClient, getPrivatePayProgram } from "../lib/arcium/index.js";
+import { PRIVATE_PAY_PROGRAM_ID, ARCIUM_PROGRAM_ID } from "../lib/arcium/constants.js";
+import {
+  getArciumEnvSafe,
+  getCompDefAccOffsetSafe,
+  getCompDefAccAddressSafe,
+  getMempoolAccAddressSafe,
+  getExecutingPoolAccAddressSafe,
+  getFeePoolAccAddressSafe,
+  getClockAccAddressSafe,
+  getComputationAccAddressSafe,
+  awaitComputationFinalizationSafe,
+} from "../lib/arcium/env.js";
+
+// Arcium client functions will be imported dynamically
+let arciumClientLib = null;
+const loadArciumClient = async () => {
+  if (!arciumClientLib) {
+    try {
+      arciumClientLib = await import("@arcium-hq/client");
+    } catch (e) {
+      console.warn("@arcium-hq/client not available:", e);
+      return null;
+    }
+  }
+  return arciumClientLib;
+};
 
 // Available tokens for swap
 const TOKENS = [
@@ -42,12 +71,15 @@ const TOKENS = [
   { id: "usdt", name: "Tether", symbol: "USDT", icon: "₮", decimals: 6 },
 ];
 
+const SIGN_PDA_SEED = "SignerAccount";
+
 export default function PrivateSwapPage() {
   const navigate = useNavigate();
-  const { publicKey, connected } = useWallet();
+  const { publicKey, connected, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const { isInitialized } = useArcium();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const arciumClient = useArciumClient();
 
   // Swap state
   const [inputToken, setInputToken] = useState("sol");
@@ -57,6 +89,21 @@ export default function PrivateSwapPage() {
   const [isSwapping, setIsSwapping] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [swapStatus, setSwapStatus] = useState(null);
+
+  const provider = useMemo(() => {
+    if (!arciumClient?.provider) return null;
+    return arciumClient.provider;
+  }, [arciumClient]);
+
+  const program = useMemo(() => {
+    if (!provider) return null;
+    try {
+      return getPrivatePayProgram(provider);
+    } catch (error) {
+      console.error("Failed to get Private Pay Program:", error);
+      return null;
+    }
+  }, [provider]);
 
   // Calculated values
   const estimatedOutput = useMemo(() => {
@@ -87,41 +134,157 @@ export default function PrivateSwapPage() {
     setInputAmount("");
   }, [inputToken, outputToken]);
 
+  const ensureReady = () => {
+    if (!connected || !publicKey) {
+      toast.error("Cüzdan bağlayın.");
+      return false;
+    }
+    
+    if (!arciumClient) {
+      toast.error("Arcium client oluşturulamadı. Lütfen sayfayı yenileyin.");
+      return false;
+    }
+    
+    if (!program) {
+      toast.error("Program yüklenemedi. Program ID kontrol edin.");
+      return false;
+    }
+    
+    if (!PRIVATE_PAY_PROGRAM_ID) {
+      toast.error("Private Pay Program ID yapılandırılmamış.");
+      return false;
+    }
+    
+    return true;
+  };
+
+  const deriveSignPda = () => {
+    const [pda] = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from(SIGN_PDA_SEED)],
+      ARCIUM_PROGRAM_ID
+    );
+    return pda;
+  };
+
+  const deriveSwapPoolPda = (tokenA, tokenB) => {
+    const [pda] = anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("pool"),
+        new anchor.BN(tokenA).toArrayLike(Buffer, "le", 8),
+        new anchor.BN(tokenB).toArrayLike(Buffer, "le", 8),
+      ],
+      PRIVATE_PAY_PROGRAM_ID
+    );
+    return pda;
+  };
+
+  const deriveCompDef = (ixName) => {
+    const offset = getCompDefAccOffsetSafe(ixName);
+    return getCompDefAccAddressSafe(PRIVATE_PAY_PROGRAM_ID, offset);
+  };
+
   // Execute swap
   const handleSwap = useCallback(async () => {
-    if (!connected || !inputAmount) return;
+    if (!ensureReady() || !inputAmount || Number(inputAmount) <= 0) {
+      toast.error("Geçerli bir miktar girin.");
+      return;
+    }
 
     setIsSwapping(true);
     setSwapStatus("encrypting");
 
     try {
-      // Step 1: Encrypt swap data
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Step 1: Get MXE public key and encrypt swap data
+      const arciumLib = await loadArciumClient();
+      if (!arciumLib) {
+        throw new Error("@arcium-hq/client kütüphanesi yüklenmemiş. Lütfen npm install @arcium-hq/client yapın.");
+      }
+
+      const mxePublicKey = await arciumLib.getMXEPublicKeyWithRetry(
+        provider,
+        PRIVATE_PAY_PROGRAM_ID
+      );
+
+      const privateKey = arciumLib.x25519.utils.randomSecretKey();
+      const encryptionPublicKey = arciumLib.x25519.getPublicKey(privateKey);
+      const sharedSecret = arciumLib.x25519.getSharedSecret(privateKey, mxePublicKey);
+      const cipher = new arciumLib.RescueCipher(sharedSecret);
+
+      // Convert input amount to lamports/token units
+      const inputAmountBn = new anchor.BN(parseFloat(inputAmount) * 1e9); // Assuming 9 decimals for SOL
+      const minOutputBn = inputAmountBn.mul(new anchor.BN(100 - parseFloat(slippage) * 10)).div(new anchor.BN(100));
+
+      // Encrypt swap amounts
+      const plaintext = [BigInt(inputAmountBn.toString()), BigInt(minOutputBn.toString())];
+      const nonce = randomBytes(16);
+      const ciphertexts = cipher.encrypt(plaintext, nonce);
+
       setSwapStatus("submitting");
 
       // Step 2: Submit to Arcium MPC network
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const compOffset = new anchor.BN(randomBytes(8), "hex");
+      const nonceU128 = new anchor.BN(nonce, "le");
+
+      const env = getArciumEnvSafe();
+      const signPda = deriveSignPda();
+      const tokenA = inputToken === "sol" ? 1 : 2;
+      const tokenB = outputToken === "usdc" ? 2 : 1;
+      const swapPoolPda = deriveSwapPoolPda(tokenA, tokenB);
+      const compDef = deriveCompDef("execute_swap");
+      const mempool = getMempoolAccAddressSafe(env.arciumClusterOffset);
+      const executingPool = getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
+      const clusterAccount = arciumClient.clusterAccount;
+      const feePool = getFeePoolAccAddressSafe(env.arciumClusterOffset);
+      const clockAcc = getClockAccAddressSafe(env.arciumClusterOffset);
+      const computationAcc = getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
+
+      const tx = await program.methods
+        .executeSwap(
+          compOffset,
+          Array.from(ciphertexts[0]),
+          Array.from(ciphertexts[1]),
+          Array.from(encryptionPublicKey),
+          nonceU128
+        )
+        .accounts({
+          payer: publicKey, // Wallet public key
+          signPdaAccount: signPda,
+          mxeAccount: arciumClient.mxeAccount,
+          mempoolAccount: mempool,
+          executingPool,
+          computationAccount: computationAcc,
+          compDefAccount: compDef,
+          clusterAccount: clusterAccount,
+          poolAccount: feePool,
+          clockAccount: clockAcc,
+          systemProgram: anchor.web3.SystemProgram.programId,
+          arciumProgram: ARCIUM_PROGRAM_ID,
+          swapPoolAccount: swapPoolPda,
+        })
+        .transaction();
+
+      const sig = await sendTransaction(tx, provider.connection);
+      await provider.connection.confirmTransaction(sig, "confirmed");
+      toast.success(`Swap transaction gönderildi: ${sig}`);
+
       setSwapStatus("computing");
 
-      // Step 3: MPC computation
-      await new Promise((resolve) => setTimeout(resolve, 2500));
-      setSwapStatus("finalizing");
-
-      // Step 4: Finalize swap
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Step 3: Wait for MPC computation
+      toast.loading("MPC hesaplaması bekleniyor...");
+      await awaitComputationFinalizationSafe(provider.connection, compOffset, PRIVATE_PAY_PROGRAM_ID, "confirmed");
+      
       setSwapStatus("success");
-
-      toast.success("Private swap executed successfully!");
+      toast.success("Private swap başarıyla tamamlandı!");
       onOpen(); // Show success modal
 
     } catch (error) {
       console.error("Swap failed:", error);
       setSwapStatus("error");
-      toast.error("Swap failed. Please try again.");
+      toast.error(error.message || "Swap başarısız. Lütfen tekrar deneyin.");
     } finally {
       setIsSwapping(false);
     }
-  }, [connected, inputAmount, onOpen]);
+  }, [connected, inputAmount, inputToken, outputToken, slippage, arciumClient, provider, program, onOpen, sendTransaction]);
 
   const statusMessages = {
     encrypting: "Encrypting swap data...",

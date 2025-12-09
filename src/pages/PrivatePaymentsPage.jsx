@@ -3,7 +3,6 @@ import { Button, Card, CardBody, Input } from "@nextui-org/react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import toast from "react-hot-toast";
 import * as anchor from "@coral-xyz/anchor";
-import { randomBytes } from "crypto";
 import { useNavigate } from "react-router-dom";
 import { ARCIUM_PROGRAM_ID, PRIVATE_PAY_PROGRAM_ID } from "../lib/arcium/constants.js";
 import { useArciumClient, getPrivatePayProgram } from "../lib/arcium/index.js";
@@ -19,6 +18,19 @@ import {
   awaitComputationFinalizationSafe,
 } from "../lib/arcium/env.js";
 import { Icons } from "../components/shared/Icons.jsx";
+
+// Browser-compatible random bytes generator
+const randomBytes = (length) => {
+  const bytes = new Uint8Array(length);
+  crypto.getRandomValues(bytes);
+  return Buffer.from(bytes);
+};
+
+// Generate random BN for Anchor
+const randomBN = (byteLength) => {
+  const bytes = randomBytes(byteLength);
+  return new anchor.BN(bytes);
+};
 
 // SIGN_PDA_SEED from arcium-anchor derive_seed!(SignerAccount)
 const SIGN_PDA_SEED = "SignerAccount";
@@ -100,10 +112,10 @@ export default function PrivatePaymentsPage() {
   const handleInitBalance = async () => {
     if (!ensureReady()) return;
     setLoading(true);
-    toast.loading("Init balance başlatılıyor...");
+    
     try {
-      const compOffset = new anchor.BN(randomBytes(8), "hex");
-      const nonce = new anchor.BN(randomBytes(16), "hex");
+      const compOffset = randomBN(8);
+      const nonce = randomBN(16);
 
       const env = getArciumEnvSafe();
       const signPda = deriveSignPda();
@@ -116,24 +128,87 @@ export default function PrivatePaymentsPage() {
       const clockAcc = getClockAccAddressSafe(env.arciumClusterOffset);
       const computationAcc = getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
 
+      // Log all accounts for debugging
+      console.log("\n=== ACCOUNT CHECK ===");
+      console.log("Accounts being used:");
+      console.log("- payer:", publicKey.toBase58());
+      console.log("- sign_pda_account:", signPda.toBase58());
+      console.log("- mxe_account:", arciumClient.mxeAccount.toBase58());
+      console.log("- mempool_account:", mempool.toBase58());
+      console.log("- executing_pool:", executingPool.toBase58());
+      console.log("- computation_account:", computationAcc.toBase58());
+      console.log("- comp_def_account:", compDef.toBase58());
+      console.log("- cluster_account:", clusterAccount.toBase58());
+      console.log("- pool_account:", feePool.toBase58());
+      console.log("- clock_account:", clockAcc.toBase58());
+      console.log("- balance_account:", balancePda.toBase58());
+      
+      // Check if critical accounts exist BEFORE creating transaction
+      console.log("\n=== CHECKING ACCOUNT EXISTENCE ===");
+      const accountsToCheck = [
+        { name: "MXE", address: arciumClient.mxeAccount, required: true },
+        { name: "Cluster", address: clusterAccount, required: true },
+        { name: "Mempool", address: mempool, required: true },
+        { name: "Executing Pool", address: executingPool, required: true },
+        { name: "Fee Pool", address: feePool, required: true },
+        { name: "Clock", address: clockAcc, required: true },
+        { name: "Comp Def", address: compDef, required: true },
+        { name: "Balance PDA", address: balancePda, required: false }, // Will be created
+      ];
+      
+      const missingAccounts = [];
+      for (const acc of accountsToCheck) {
+        const info = await provider.connection.getAccountInfo(acc.address);
+        const exists = info !== null;
+        console.log(`${acc.name} (${acc.address.toBase58()}): ${exists ? "✓ EXISTS" : "✗ NOT FOUND"}`);
+        if (!exists && acc.required) {
+          missingAccounts.push(acc.name);
+        }
+      }
+      
+      if (missingAccounts.length > 0) {
+        const errorMsg = `Missing required Arcium accounts: ${missingAccounts.join(", ")}. These accounts need to be initialized on the Arcium network first.`;
+        console.error(errorMsg);
+        toast.error(errorMsg);
+        return;
+      }
+      
+      console.log("\n=== ALL REQUIRED ACCOUNTS EXIST, CREATING TRANSACTION ===");
+      toast.loading("Init balance başlatılıyor...")
+
       const tx = await program.methods
         .createBalanceAccount(compOffset, nonce)
         .accounts({
           payer: publicKey,
-          signPdaAccount: signPda,
-          mxeAccount: arciumClient.mxeAccount,
-          mempoolAccount: mempool,
-          executingPool,
-          computationAccount: computationAcc,
-          compDefAccount: compDef,
-          clusterAccount: clusterAccount,
-          poolAccount: feePool,
-          clockAccount: clockAcc,
-          systemProgram: anchor.web3.SystemProgram.programId,
-          arciumProgram: ARCIUM_PROGRAM_ID,
-          balanceAccount: balancePda,
+          sign_pda_account: signPda,
+          mxe_account: arciumClient.mxeAccount,
+          mempool_account: mempool,
+          executing_pool: executingPool,
+          computation_account: computationAcc,
+          comp_def_account: compDef,
+          cluster_account: clusterAccount,
+          pool_account: feePool,
+          clock_account: clockAcc,
+          system_program: anchor.web3.SystemProgram.programId,
+          arcium_program: ARCIUM_PROGRAM_ID,
+          balance_account: balancePda,
         })
         .transaction();
+
+      // Set fee payer and get recent blockhash
+      tx.feePayer = publicKey;
+      tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
+
+      // Simulate to get detailed error
+      console.log("Simulating init balance transaction...");
+      const simulation = await provider.connection.simulateTransaction(tx);
+      console.log("Simulation result:", simulation);
+      
+      if (simulation.value.err) {
+        console.error("Simulation error:", simulation.value.err);
+        console.error("Simulation logs:", simulation.value.logs);
+        throw new Error(`Simulation failed: ${simulation.value.logs?.join('\n') || JSON.stringify(simulation.value.err)}`);
+      }
 
       const sig = await sendTransaction(tx, provider.connection);
       await provider.connection.confirmTransaction(sig, "confirmed");
@@ -143,8 +218,10 @@ export default function PrivatePaymentsPage() {
       await awaitComputationFinalizationSafe(provider.connection, compOffset, PRIVATE_PAY_PROGRAM_ID, "confirmed");
       toast.success("Init balance tamamlandı.");
     } catch (e) {
-      console.error(e);
-      toast.error(e.message || "Init balance hatası");
+      console.error("Init balance error:", e);
+      console.error("Error details:", e.logs || e.message);
+      const errorMsg = e.logs ? e.logs.join('\n') : e.message;
+      toast.error(`Init balance hatası: ${errorMsg}`);
     } finally {
       setLoading(false);
     }
@@ -159,7 +236,7 @@ export default function PrivatePaymentsPage() {
     setLoading(true);
     toast.loading("Deposit gönderiliyor...");
     try {
-      const compOffset = new anchor.BN(randomBytes(8), "hex");
+      const compOffset = randomBN(8);
       const amountBn = new anchor.BN(amount);
 
       const env = getArciumEnvSafe();
@@ -177,21 +254,25 @@ export default function PrivatePaymentsPage() {
         .depositFunds(compOffset, amountBn)
         .accounts({
           payer: publicKey,
-          signPdaAccount: signPda,
-          mxeAccount: arciumClient.mxeAccount,
-          mempoolAccount: mempool,
-          executingPool,
-          computationAccount: computationAcc,
-          compDefAccount: compDef,
-          clusterAccount: clusterAccount,
-          poolAccount: feePool,
-          clockAccount: clockAcc,
-          systemProgram: anchor.web3.SystemProgram.programId,
-          arciumProgram: ARCIUM_PROGRAM_ID,
-          balanceAccount: balancePda,
+          sign_pda_account: signPda,
+          mxe_account: arciumClient.mxeAccount,
+          mempool_account: mempool,
+          executing_pool: executingPool,
+          computation_account: computationAcc,
+          comp_def_account: compDef,
+          cluster_account: clusterAccount,
+          pool_account: feePool,
+          clock_account: clockAcc,
+          system_program: anchor.web3.SystemProgram.programId,
+          arcium_program: ARCIUM_PROGRAM_ID,
+          balance_account: balancePda,
           owner: publicKey,
         })
         .transaction();
+
+      // Set fee payer and get recent blockhash
+      tx.feePayer = publicKey;
+      tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
 
       const sig = await sendTransaction(tx, provider.connection);
       await provider.connection.confirmTransaction(sig, "confirmed");

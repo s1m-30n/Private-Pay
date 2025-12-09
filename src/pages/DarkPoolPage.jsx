@@ -25,7 +25,7 @@ import {
   useDisclosure,
   Progress,
 } from "@nextui-org/react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useArcium } from "../providers/SolanaProvider";
 import { Icons } from "../components/shared/Icons";
@@ -46,6 +46,37 @@ import {
   Activity,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import * as anchor from "@coral-xyz/anchor";
+import { randomBytes } from "crypto";
+import { useArciumClient, getPrivatePayProgram } from "../lib/arcium/index.js";
+import { PRIVATE_PAY_PROGRAM_ID, ARCIUM_PROGRAM_ID } from "../lib/arcium/constants.js";
+import {
+  getArciumEnvSafe,
+  getCompDefAccOffsetSafe,
+  getCompDefAccAddressSafe,
+  getMempoolAccAddressSafe,
+  getExecutingPoolAccAddressSafe,
+  getFeePoolAccAddressSafe,
+  getClockAccAddressSafe,
+  getComputationAccAddressSafe,
+  awaitComputationFinalizationSafe,
+} from "../lib/arcium/env.js";
+
+// Arcium client functions will be imported dynamically
+let arciumClientLib = null;
+const loadArciumClient = async () => {
+  if (!arciumClientLib) {
+    try {
+      arciumClientLib = await import("@arcium-hq/client");
+    } catch (e) {
+      console.warn("@arcium-hq/client not available:", e);
+      return null;
+    }
+  }
+  return arciumClientLib;
+};
+
+const SIGN_PDA_SEED = "SignerAccount";
 
 // Trading pairs
 const TRADING_PAIRS = [
@@ -68,9 +99,11 @@ const MOCK_TRADES = [
 
 export default function DarkPoolPage() {
   const navigate = useNavigate();
-  const { publicKey, connected } = useWallet();
+  const { publicKey, connected, sendTransaction } = useWallet();
+  const { connection } = useConnection();
   const { isInitialized } = useArcium();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const arciumClient = useArciumClient();
 
   // Order state
   const [selectedPair, setSelectedPair] = useState("sol-usdc");
@@ -81,6 +114,61 @@ export default function DarkPoolPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderStatus, setOrderStatus] = useState(null);
   const [activeTab, setActiveTab] = useState("orderbook");
+
+  const provider = useMemo(() => {
+    if (!arciumClient?.provider) return null;
+    return arciumClient.provider;
+  }, [arciumClient]);
+
+  const program = useMemo(() => {
+    if (!provider) return null;
+    try {
+      return getPrivatePayProgram(provider);
+    } catch (error) {
+      console.error("Failed to get Private Pay Program:", error);
+      return null;
+    }
+  }, [provider]);
+
+  const ensureReady = () => {
+    if (!connected || !publicKey) {
+      toast.error("Cüzdan bağlayın.");
+      return false;
+    }
+    
+    if (!arciumClient) {
+      toast.error("Arcium client oluşturulamadı. Lütfen sayfayı yenileyin.");
+      return false;
+    }
+    
+    if (!program) {
+      toast.error("Program yüklenemedi. Program ID kontrol edin.");
+      return false;
+    }
+    
+    return true;
+  };
+
+  const deriveSignPda = () => {
+    const [pda] = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from(SIGN_PDA_SEED)],
+      ARCIUM_PROGRAM_ID
+    );
+    return pda;
+  };
+
+  const deriveOrderBookPda = (pair) => {
+    const [pda] = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("orderbook"), Buffer.from(pair)],
+      PRIVATE_PAY_PROGRAM_ID
+    );
+    return pda;
+  };
+
+  const deriveCompDef = (ixName) => {
+    const offset = getCompDefAccOffsetSafe(ixName);
+    return getCompDefAccAddressSafe(PRIVATE_PAY_PROGRAM_ID, offset);
+  };
 
   // Stats
   const [stats] = useState({
@@ -98,50 +186,209 @@ export default function DarkPoolPage() {
 
   // Place order
   const handlePlaceOrder = useCallback(async () => {
-    if (!connected || !orderSize || !orderPrice) return;
+    if (!ensureReady() || !orderSize || (orderType === "limit" && !orderPrice)) {
+      toast.error("Lütfen tüm alanları doldurun.");
+      return;
+    }
 
     setIsSubmitting(true);
     setOrderStatus("encrypting");
 
     try {
-      // Step 1: Encrypt order
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Step 1: Get MXE public key and encrypt order data
+      const arciumLib = await loadArciumClient();
+      if (!arciumLib) {
+        throw new Error("@arcium-hq/client kütüphanesi yüklenmemiş.");
+      }
+
+      const mxePublicKey = await arciumLib.getMXEPublicKeyWithRetry(
+        provider,
+        PRIVATE_PAY_PROGRAM_ID
+      );
+
+      const privateKey = arciumLib.x25519.utils.randomSecretKey();
+      const encryptionPublicKey = arciumLib.x25519.getPublicKey(privateKey);
+      const sharedSecret = arciumLib.x25519.getSharedSecret(privateKey, mxePublicKey);
+      const cipher = new arciumLib.RescueCipher(sharedSecret);
+
+      // Convert amounts to proper units
+      const sizeBn = new anchor.BN(parseFloat(orderSize) * 1e9);
+      const priceBn = orderType === "limit" 
+        ? new anchor.BN(parseFloat(orderPrice) * 1e6) // Assuming 6 decimals for USDC
+        : new anchor.BN(0); // Market orders use current price
+      const side = orderSide === "buy" ? 0 : 1;
+
+      // Encrypt order fields separately
+      const sidePlaintext = [BigInt(side)];
+      const sizePlaintext = [BigInt(sizeBn.toString())];
+      const pricePlaintext = [BigInt(priceBn.toString())];
+      const nonce = randomBytes(16);
+      
+      const ciphertextSide = cipher.encrypt(sidePlaintext, nonce)[0];
+      const ciphertextSize = cipher.encrypt(sizePlaintext, nonce)[0];
+      const ciphertextPrice = cipher.encrypt(pricePlaintext, nonce)[0];
+
       setOrderStatus("submitting");
 
       // Step 2: Submit to dark pool
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const compOffset = new anchor.BN(randomBytes(8), "hex");
+      const nonceU128 = new anchor.BN(nonce, "le");
+
+      const env = getArciumEnvSafe();
+      const signPda = deriveSignPda();
+      const orderBookPda = deriveOrderBookPda(selectedPair);
+      const compDef = deriveCompDef("place_order");
+      const mempool = getMempoolAccAddressSafe(env.arciumClusterOffset);
+      const executingPool = getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
+      const clusterAccount = arciumClient.clusterAccount;
+      const feePool = getFeePoolAccAddressSafe(env.arciumClusterOffset);
+      const clockAcc = getClockAccAddressSafe(env.arciumClusterOffset);
+      const computationAcc = getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
+
+      const tx = await program.methods
+        .placeOrder(
+          compOffset,
+          Array.from(ciphertextSide),
+          Array.from(ciphertextSize),
+          Array.from(ciphertextPrice),
+          Array.from(encryptionPublicKey),
+          nonceU128
+        )
+        .accounts({
+          payer: publicKey,
+          signPdaAccount: signPda,
+          mxeAccount: arciumClient.mxeAccount,
+          mempoolAccount: mempool,
+          executingPool,
+          computationAccount: computationAcc,
+          compDefAccount: compDef,
+          clusterAccount: clusterAccount,
+          poolAccount: feePool,
+          clockAccount: clockAcc,
+          systemProgram: anchor.web3.SystemProgram.programId,
+          arciumProgram: ARCIUM_PROGRAM_ID,
+          orderBookAccount: orderBookPda,
+        })
+        .transaction();
+
+      const sig = await sendTransaction(tx, provider.connection);
+      await provider.connection.confirmTransaction(sig, "confirmed");
+      toast.success(`Order transaction gönderildi: ${sig}`);
+
       setOrderStatus("processing");
 
-      // Step 3: Add to encrypted order book
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Step 3: Wait for MPC computation
+      toast.loading("MPC hesaplaması bekleniyor...");
+      await awaitComputationFinalizationSafe(provider.connection, compOffset, PRIVATE_PAY_PROGRAM_ID, "confirmed");
+      
       setOrderStatus("success");
-
-      toast.success("Order placed in dark pool!");
+      toast.success("Order dark pool'a başarıyla eklendi!");
       onOpen();
 
     } catch (error) {
       console.error("Order failed:", error);
       setOrderStatus("error");
-      toast.error("Failed to place order");
+      toast.error(error.message || "Order başarısız. Lütfen tekrar deneyin.");
     } finally {
       setIsSubmitting(false);
     }
-  }, [connected, orderSize, orderPrice, onOpen]);
+  }, [connected, orderSize, orderPrice, orderSide, orderType, selectedPair, arciumClient, provider, program, onOpen, sendTransaction]);
 
   // Trigger matching
   const handleMatchOrders = useCallback(async () => {
-    if (!connected) return;
+    if (!ensureReady()) return;
 
     setIsSubmitting(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      toast.success("Order matching completed!");
+      const arciumLib = await loadArciumClient();
+      if (!arciumLib) {
+        throw new Error("@arcium-hq/client kütüphanesi yüklenmemiş.");
+      }
+
+      const mxePublicKey = await arciumLib.getMXEPublicKeyWithRetry(
+        provider,
+        PRIVATE_PAY_PROGRAM_ID
+      );
+
+      const privateKey = arciumLib.x25519.utils.randomSecretKey();
+      const encryptionPublicKey = arciumLib.x25519.getPublicKey(privateKey);
+      const sharedSecret = arciumLib.x25519.getSharedSecret(privateKey, mxePublicKey);
+      const cipher = new arciumLib.RescueCipher(sharedSecret);
+
+      // Mock buy and sell orders for matching (in production, these would come from order book)
+      const buySide = BigInt(0);
+      const buySize = BigInt(1000000);
+      const buyPrice = BigInt(180000000);
+      const sellSide = BigInt(1);
+      const sellSize = BigInt(1000000);
+      const sellPrice = BigInt(180000000);
+
+      const nonce = randomBytes(16);
+      const ciphertextBuySide = cipher.encrypt([buySide], nonce)[0];
+      const ciphertextBuySize = cipher.encrypt([buySize], nonce)[0];
+      const ciphertextBuyPrice = cipher.encrypt([buyPrice], nonce)[0];
+      const ciphertextSellSide = cipher.encrypt([sellSide], nonce)[0];
+      const ciphertextSellSize = cipher.encrypt([sellSize], nonce)[0];
+      const ciphertextSellPrice = cipher.encrypt([sellPrice], nonce)[0];
+
+      const compOffset = new anchor.BN(randomBytes(8), "hex");
+      const nonceU128 = new anchor.BN(nonce, "le");
+
+      const env = getArciumEnvSafe();
+      const signPda = deriveSignPda();
+      const orderBookPda = deriveOrderBookPda(selectedPair);
+      const compDef = deriveCompDef("match_orders");
+      const mempool = getMempoolAccAddressSafe(env.arciumClusterOffset);
+      const executingPool = getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
+      const clusterAccount = arciumClient.clusterAccount;
+      const feePool = getFeePoolAccAddressSafe(env.arciumClusterOffset);
+      const clockAcc = getClockAccAddressSafe(env.arciumClusterOffset);
+      const computationAcc = getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
+
+      const tx = await program.methods
+        .matchOrders(
+          compOffset,
+          Array.from(ciphertextBuySide),
+          Array.from(ciphertextBuySize),
+          Array.from(ciphertextBuyPrice),
+          Array.from(ciphertextSellSide),
+          Array.from(ciphertextSellSize),
+          Array.from(ciphertextSellPrice),
+          Array.from(encryptionPublicKey),
+          nonceU128
+        )
+        .accounts({
+          payer: publicKey,
+          signPdaAccount: signPda,
+          mxeAccount: arciumClient.mxeAccount,
+          mempoolAccount: mempool,
+          executingPool,
+          computationAccount: computationAcc,
+          compDefAccount: compDef,
+          clusterAccount: clusterAccount,
+          poolAccount: feePool,
+          clockAccount: clockAcc,
+          systemProgram: anchor.web3.SystemProgram.programId,
+          arciumProgram: ARCIUM_PROGRAM_ID,
+          orderBookAccount: orderBookPda,
+        })
+        .transaction();
+
+      const sig = await sendTransaction(tx, provider.connection);
+      await provider.connection.confirmTransaction(sig, "confirmed");
+      toast.success(`Match transaction gönderildi: ${sig}`);
+
+      toast.loading("MPC hesaplaması bekleniyor...");
+      await awaitComputationFinalizationSafe(provider.connection, compOffset, PRIVATE_PAY_PROGRAM_ID, "confirmed");
+      
+      toast.success("Order matching tamamlandı!");
     } catch (error) {
-      toast.error("Matching failed");
+      console.error("Matching failed:", error);
+      toast.error(error.message || "Matching başarısız.");
     } finally {
       setIsSubmitting(false);
     }
-  }, [connected]);
+  }, [connected, selectedPair, arciumClient, provider, program, sendTransaction]);
 
   const statusMessages = {
     encrypting: "Encrypting order...",
