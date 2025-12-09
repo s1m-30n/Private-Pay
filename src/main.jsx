@@ -3,6 +3,13 @@ import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 
+// Polyfill for require in browser (for CommonJS modules)
+if (typeof window !== "undefined" && typeof window.require === "undefined") {
+  window.require = (id) => {
+    throw new Error(`require('${id}') is not supported in browser. Use ES modules instead.`);
+  };
+}
+
 // Global error handler for uncaught promise rejections
 window.addEventListener('unhandledrejection', (event) => {
   console.error('[Global] Unhandled promise rejection:', event.reason);

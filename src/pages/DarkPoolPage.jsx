@@ -152,33 +152,27 @@ export default function DarkPoolPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-green-500/10 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-8">
+    <div className="flex min-h-screen w-full items-start justify-center py-20 px-4 md:px-10 bg-gradient-to-br from-white to-indigo-50/30">
+      <div className="w-full max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Button
               isIconOnly
-              variant="flat"
-              className="bg-white/5 text-white"
+              variant="light"
+              className="text-gray-600"
               onClick={() => navigate("/arcium")}
             >
               <Icons.back className="w-5 h-5" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                 Dark Pool
-                <Chip size="sm" color="success" variant="flat">
+                <Chip size="sm" color="primary" variant="flat">
                   Private Order Book
                 </Chip>
               </h1>
-              <p className="text-slate-400 text-sm">
+              <p className="text-gray-500 text-sm">
                 Trade with hidden orders, protected from front-running
               </p>
             </div>
@@ -189,10 +183,7 @@ export default function DarkPoolPage() {
               selectedKeys={[selectedPair]}
               onChange={(e) => setSelectedPair(e.target.value)}
               className="w-40"
-              classNames={{
-                trigger: "bg-white/10 border-white/20 text-white",
-                value: "text-white",
-              }}
+              variant="bordered"
             >
               {TRADING_PAIRS.map((pair) => (
                 <SelectItem key={pair.id} value={pair.id}>
@@ -200,7 +191,7 @@ export default function DarkPoolPage() {
                 </SelectItem>
               ))}
             </Select>
-            <WalletMultiButton className="!bg-gradient-to-r !from-emerald-600 !to-green-600 !rounded-xl !h-10" />
+            <WalletMultiButton className="!bg-primary !rounded-xl !h-10" />
           </div>
         </div>
 
@@ -212,13 +203,13 @@ export default function DarkPoolPage() {
             { label: "Avg Spread", value: stats.avgSpread, icon: <Activity className="w-4 h-4" /> },
             { label: "Match Rate", value: stats.matchRate, icon: <Check className="w-4 h-4" /> },
           ].map((stat, i) => (
-            <Card key={i} className="bg-white/5 border border-white/10">
+            <Card key={i} className="bg-white border border-gray-200 shadow-sm">
               <CardBody className="flex flex-row items-center justify-between p-4">
                 <div>
-                  <p className="text-slate-400 text-xs">{stat.label}</p>
-                  <p className="text-white text-lg font-bold">{stat.value}</p>
+                  <p className="text-gray-500 text-xs">{stat.label}</p>
+                  <p className="text-gray-900 text-lg font-bold">{stat.value}</p>
                 </div>
-                <div className="text-emerald-400">{stat.icon}</div>
+                <div className="text-primary">{stat.icon}</div>
               </CardBody>
             </Card>
           ))}
@@ -226,10 +217,10 @@ export default function DarkPoolPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Order Form */}
-          <Card className="bg-white/5 border border-white/10 lg:col-span-1">
+          <Card className="bg-white border border-gray-200 shadow-sm rounded-3xl lg:col-span-1">
             <CardBody className="p-6">
-              <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                <Lock className="w-4 h-4 text-emerald-400" />
+              <h3 className="text-gray-900 font-bold mb-4 flex items-center gap-2">
+                <Lock className="w-4 h-4 text-primary" />
                 Place Hidden Order
               </h3>
 
@@ -239,9 +230,9 @@ export default function DarkPoolPage() {
                 onSelectionChange={setOrderSide}
                 className="mb-4"
                 classNames={{
-                  tabList: "bg-white/5",
-                  tab: "text-slate-400",
-                  cursor: orderSide === "buy" ? "bg-emerald-600" : "bg-red-600",
+                  tabList: "bg-gray-50",
+                  tab: "text-gray-600",
+                  cursor: "bg-primary",
                 }}
               >
                 <Tab
@@ -269,11 +260,7 @@ export default function DarkPoolPage() {
                     key={type}
                     size="sm"
                     variant={orderType === type ? "solid" : "flat"}
-                    className={
-                      orderType === type
-                        ? "bg-white/20 text-white"
-                        : "bg-white/5 text-slate-400"
-                    }
+                    color={orderType === type ? "primary" : "default"}
                     onClick={() => setOrderType(type)}
                   >
                     {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -284,7 +271,7 @@ export default function DarkPoolPage() {
               {/* Price Input */}
               {orderType === "limit" && (
                 <div className="mb-4">
-                  <label className="text-slate-400 text-sm mb-2 block">
+                  <label className="text-gray-600 text-sm mb-2 block">
                     Price ({currentPair?.quote})
                   </label>
                   <Input
@@ -292,12 +279,9 @@ export default function DarkPoolPage() {
                     placeholder={currentPair?.price.toString()}
                     value={orderPrice}
                     onChange={(e) => setOrderPrice(e.target.value)}
-                    classNames={{
-                      input: "text-white",
-                      inputWrapper: "bg-white/10 border-white/20",
-                    }}
+                    variant="bordered"
                     endContent={
-                      <span className="text-slate-400 text-sm">
+                      <span className="text-gray-500 text-sm">
                         {currentPair?.quote}
                       </span>
                     }
@@ -307,7 +291,7 @@ export default function DarkPoolPage() {
 
               {/* Size Input */}
               <div className="mb-4">
-                <label className="text-slate-400 text-sm mb-2 block">
+                <label className="text-gray-600 text-sm mb-2 block">
                   Size ({currentPair?.base})
                 </label>
                 <Input
@@ -315,12 +299,9 @@ export default function DarkPoolPage() {
                   placeholder="0.00"
                   value={orderSize}
                   onChange={(e) => setOrderSize(e.target.value)}
-                  classNames={{
-                    input: "text-white",
-                    inputWrapper: "bg-white/10 border-white/20",
-                  }}
+                  variant="bordered"
                   endContent={
-                    <span className="text-slate-400 text-sm">
+                    <span className="text-gray-500 text-sm">
                       {currentPair?.base}
                     </span>
                   }
@@ -328,10 +309,10 @@ export default function DarkPoolPage() {
               </div>
 
               {/* Total */}
-              <div className="mb-6 p-3 bg-white/5 rounded-xl">
+              <div className="mb-6 p-3 bg-gray-50 rounded-xl border border-gray-200">
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Total</span>
-                  <span className="text-white font-mono">
+                  <span className="text-gray-600">Total</span>
+                  <span className="text-gray-900 font-mono">
                     {orderSize && orderPrice
                       ? (parseFloat(orderSize) * parseFloat(orderPrice)).toFixed(2)
                       : "0.00"}{" "}
@@ -341,15 +322,15 @@ export default function DarkPoolPage() {
               </div>
 
               {/* Privacy Notice */}
-              <Card className="bg-emerald-500/10 border border-emerald-500/20 mb-4">
+              <Card className="bg-primary/10 border border-primary/20 mb-4">
                 <CardBody className="p-3">
                   <div className="flex items-start gap-2">
-                    <Shield className="w-4 h-4 text-emerald-400 mt-0.5" />
+                    <Shield className="w-4 h-4 text-primary mt-0.5" />
                     <div>
-                      <p className="text-emerald-400 text-xs font-medium">
+                      <p className="text-primary text-xs font-medium">
                         Order Privacy
                       </p>
-                      <p className="text-slate-400 text-xs">
+                      <p className="text-gray-600 text-xs">
                         Size and price are encrypted. Only matched trades are revealed.
                       </p>
                     </div>
@@ -359,14 +340,11 @@ export default function DarkPoolPage() {
 
               {/* Place Order Button */}
               {!connected ? (
-                <WalletMultiButton className="!w-full !bg-gradient-to-r !from-emerald-600 !to-green-600 !rounded-xl !h-12 !justify-center" />
+                <WalletMultiButton className="!w-full !bg-primary !rounded-xl !h-12 !justify-center" />
               ) : (
                 <Button
-                  className={`w-full h-12 font-semibold ${
-                    orderSide === "buy"
-                      ? "bg-gradient-to-r from-emerald-600 to-green-600"
-                      : "bg-gradient-to-r from-red-600 to-rose-600"
-                  } text-white`}
+                  color={orderSide === "buy" ? "primary" : "danger"}
+                  className="w-full h-12 font-semibold"
                   onClick={handlePlaceOrder}
                   isDisabled={!orderSize || (orderType === "limit" && !orderPrice) || isSubmitting}
                   isLoading={isSubmitting}
@@ -380,15 +358,15 @@ export default function DarkPoolPage() {
           </Card>
 
           {/* Order Book & Trades */}
-          <Card className="bg-white/5 border border-white/10 lg:col-span-2">
+          <Card className="bg-white border border-gray-200 shadow-sm rounded-3xl lg:col-span-2">
             <CardBody className="p-6">
               <Tabs
                 selectedKey={activeTab}
                 onSelectionChange={setActiveTab}
                 classNames={{
-                  tabList: "bg-white/5",
-                  tab: "text-slate-400",
-                  cursor: "bg-emerald-600",
+                  tabList: "bg-gray-50",
+                  tab: "text-gray-600",
+                  cursor: "bg-primary",
                 }}
               >
                 <Tab
@@ -404,7 +382,7 @@ export default function DarkPoolPage() {
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       {/* Bids */}
                       <div>
-                        <h4 className="text-emerald-400 font-medium mb-3 flex items-center gap-2">
+                        <h4 className="text-emerald-600 font-medium mb-3 flex items-center gap-2">
                           <TrendingUp className="w-4 h-4" /> Bids (Hidden)
                         </h4>
                         <div className="space-y-2">
@@ -415,10 +393,10 @@ export default function DarkPoolPage() {
                                 style={{ width: `${width}%` }}
                               />
                               <div className="relative flex justify-between items-center px-3 h-full">
-                                <span className="text-slate-500 text-sm font-mono">
+                                <span className="text-gray-500 text-sm font-mono">
                                   *****
                                 </span>
-                                <span className="text-slate-500 text-sm font-mono">
+                                <span className="text-gray-500 text-sm font-mono">
                                   ****
                                 </span>
                               </div>
@@ -429,7 +407,7 @@ export default function DarkPoolPage() {
 
                       {/* Asks */}
                       <div>
-                        <h4 className="text-red-400 font-medium mb-3 flex items-center gap-2">
+                        <h4 className="text-red-600 font-medium mb-3 flex items-center gap-2">
                           <TrendingDown className="w-4 h-4" /> Asks (Hidden)
                         </h4>
                         <div className="space-y-2">
@@ -440,10 +418,10 @@ export default function DarkPoolPage() {
                                 style={{ width: `${width}%` }}
                               />
                               <div className="relative flex justify-between items-center px-3 h-full">
-                                <span className="text-slate-500 text-sm font-mono">
+                                <span className="text-gray-500 text-sm font-mono">
                                   *****
                                 </span>
-                                <span className="text-slate-500 text-sm font-mono">
+                                <span className="text-gray-500 text-sm font-mono">
                                   ****
                                 </span>
                               </div>
@@ -453,9 +431,9 @@ export default function DarkPoolPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-center gap-2 py-4 border-t border-white/10">
-                      <EyeOff className="w-5 h-5 text-slate-500" />
-                      <span className="text-slate-400 text-sm">
+                    <div className="flex items-center justify-center gap-2 py-4 border-t border-gray-200">
+                      <EyeOff className="w-5 h-5 text-gray-500" />
+                      <span className="text-gray-600 text-sm">
                         Order details encrypted until matched
                       </span>
                     </div>
@@ -476,8 +454,8 @@ export default function DarkPoolPage() {
                       classNames={{
                         base: "max-h-[400px]",
                         wrapper: "bg-transparent",
-                        th: "bg-white/5 text-slate-400",
-                        td: "text-white",
+                        th: "bg-gray-50 text-gray-600",
+                        td: "text-gray-900",
                       }}
                     >
                       <TableHeader>
@@ -544,8 +522,8 @@ export default function DarkPoolPage() {
                       aria-label="Recent trades"
                       classNames={{
                         wrapper: "bg-transparent",
-                        th: "bg-white/5 text-slate-400",
-                        td: "text-white",
+                        th: "bg-gray-50 text-gray-600",
+                        td: "text-gray-900",
                       }}
                     >
                       <TableHeader>
@@ -561,8 +539,8 @@ export default function DarkPoolPage() {
                               <span
                                 className={
                                   trade.side === "buy"
-                                    ? "text-emerald-400"
-                                    : "text-red-400"
+                                    ? "text-emerald-600"
+                                    : "text-red-600"
                                 }
                               >
                                 {trade.side.toUpperCase()}
@@ -570,7 +548,7 @@ export default function DarkPoolPage() {
                             </TableCell>
                             <TableCell className="font-mono">{trade.size}</TableCell>
                             <TableCell className="font-mono">{trade.price}</TableCell>
-                            <TableCell className="text-slate-400">{trade.time}</TableCell>
+                            <TableCell className="text-gray-500">{trade.time}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -581,9 +559,10 @@ export default function DarkPoolPage() {
 
               {/* Match Button */}
               {connected && (
-                <div className="mt-4 pt-4 border-t border-white/10">
+                <div className="mt-4 pt-4 border-t border-gray-200">
                   <Button
-                    className="w-full bg-white/10 text-white"
+                    variant="bordered"
+                    className="w-full"
                     onClick={handleMatchOrders}
                     isLoading={isSubmitting}
                   >
@@ -597,27 +576,27 @@ export default function DarkPoolPage() {
         </div>
 
         {/* Info Card */}
-        <Card className="bg-white/5 border border-white/10 mt-6">
+        <Card className="bg-white border border-gray-200 shadow-sm rounded-3xl mt-6">
           <CardBody className="p-6">
-            <h3 className="text-white font-bold mb-4">About Dark Pool Trading</h3>
+            <h3 className="text-gray-900 font-bold mb-4">About Dark Pool Trading</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <h4 className="text-emerald-400 font-medium mb-2">Hidden Orders</h4>
-                <p className="text-slate-400 text-sm">
+                <h4 className="text-primary font-medium mb-2">Hidden Orders</h4>
+                <p className="text-gray-600 text-sm">
                   Your order size and price are encrypted using MPC. No one can see your
                   trading intentions until orders are matched.
                 </p>
               </div>
               <div>
-                <h4 className="text-emerald-400 font-medium mb-2">MEV Protection</h4>
-                <p className="text-slate-400 text-sm">
+                <h4 className="text-primary font-medium mb-2">MEV Protection</h4>
+                <p className="text-gray-600 text-sm">
                   Front-running is impossible because order details are never revealed
                   on-chain before execution.
                 </p>
               </div>
               <div>
-                <h4 className="text-emerald-400 font-medium mb-2">Fair Matching</h4>
-                <p className="text-slate-400 text-sm">
+                <h4 className="text-primary font-medium mb-2">Fair Matching</h4>
+                <p className="text-gray-600 text-sm">
                   Orders are matched inside the MPC environment at the mid-price,
                   ensuring fair execution for all participants.
                 </p>
@@ -628,19 +607,19 @@ export default function DarkPoolPage() {
       </div>
 
       {/* Success Modal */}
-      <Modal isOpen={isOpen} onClose={onClose} className="bg-slate-900">
+      <Modal isOpen={isOpen} onClose={onClose}>
         <ModalContent>
-          <ModalHeader className="text-white">Order Placed!</ModalHeader>
+          <ModalHeader className="text-gray-900">Order Placed!</ModalHeader>
           <ModalBody>
             <div className="text-center py-4">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary flex items-center justify-center">
                 <Check className="w-8 h-8 text-white" />
               </div>
-              <p className="text-slate-300 mb-4">
+              <p className="text-gray-600 mb-4">
                 Your order has been encrypted and added to the dark pool.
               </p>
-              <div className="bg-white/5 rounded-xl p-4">
-                <div className="flex items-center justify-center gap-2 text-emerald-400">
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <div className="flex items-center justify-center gap-2 text-primary">
                   <Lock className="w-4 h-4" />
                   <span className="text-sm">Order details are hidden from other traders</span>
                 </div>
@@ -649,7 +628,8 @@ export default function DarkPoolPage() {
           </ModalBody>
           <ModalFooter>
             <Button
-              className="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white"
+              color="primary"
+              className="w-full"
               onClick={onClose}
             >
               Done
@@ -660,4 +640,7 @@ export default function DarkPoolPage() {
     </div>
   );
 }
+
+
+
 

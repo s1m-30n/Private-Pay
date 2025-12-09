@@ -133,34 +133,28 @@ export default function PrivateSwapPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Background effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative z-10 max-w-lg mx-auto px-4 py-8">
+    <div className="flex min-h-screen w-full items-start justify-center py-20 px-4 md:px-10 bg-gradient-to-br from-white to-indigo-50/30">
+      <div className="relative flex flex-col gap-4 w-full max-w-lg">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Button
               isIconOnly
-              variant="flat"
-              className="bg-white/5 text-white"
+              variant="light"
+              className="text-gray-600"
               onClick={() => navigate("/arcium")}
             >
               <Icons.back className="w-5 h-5" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-white">Private Swap</h1>
-              <p className="text-slate-400 text-sm">MEV-protected trading</p>
+              <h1 className="text-2xl font-bold text-gray-900">Private Swap</h1>
+              <p className="text-gray-500 text-sm">MEV-protected trading</p>
             </div>
           </div>
           <Button
             isIconOnly
-            variant="flat"
-            className="bg-white/5 text-white"
+            variant="light"
+            className="text-gray-600"
             onClick={() => setShowAdvanced(!showAdvanced)}
           >
             <Settings className="w-5 h-5" />
@@ -168,30 +162,30 @@ export default function PrivateSwapPage() {
         </div>
 
         {/* Security Notice */}
-        <Card className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 mb-6">
+        <Card className="bg-primary/10 border border-primary/20 mb-4">
           <CardBody className="flex flex-row items-center gap-3 py-3">
-            <Shield className="w-5 h-5 text-cyan-400" />
+            <Shield className="w-5 h-5 text-primary" />
             <div className="flex-1">
-              <p className="text-white text-sm font-medium">
+              <p className="text-gray-900 text-sm font-medium">
                 Your swap amounts are encrypted
               </p>
-              <p className="text-slate-400 text-xs">
+              <p className="text-gray-600 text-xs">
                 Protected from MEV bots and front-runners
               </p>
             </div>
-            <Lock className="w-4 h-4 text-cyan-400" />
+            <Lock className="w-4 h-4 text-primary" />
           </CardBody>
         </Card>
 
         {/* Main Swap Card */}
-        <Card className="bg-white/5 border border-white/10">
+        <Card className="bg-white border border-gray-200 shadow-sm rounded-3xl">
           <CardBody className="p-6">
             {/* Input Token */}
             <div className="mb-2">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-slate-400 text-sm">You pay</span>
-                <span className="text-slate-400 text-xs">
-                  Balance: <span className="text-white">****</span>
+                <span className="text-gray-600 text-sm">You pay</span>
+                <span className="text-gray-500 text-xs">
+                  Balance: <span className="text-gray-900">****</span>
                 </span>
               </div>
               <div className="flex gap-3">
@@ -199,10 +193,7 @@ export default function PrivateSwapPage() {
                   selectedKeys={[inputToken]}
                   onChange={(e) => setInputToken(e.target.value)}
                   className="w-32"
-                  classNames={{
-                    trigger: "bg-white/10 border-white/20 text-white",
-                    value: "text-white",
-                  }}
+                  variant="bordered"
                 >
                   {TOKENS.map((token) => (
                     <SelectItem key={token.id} value={token.id}>
@@ -216,9 +207,9 @@ export default function PrivateSwapPage() {
                   value={inputAmount}
                   onChange={(e) => setInputAmount(e.target.value)}
                   className="flex-1"
+                  variant="bordered"
                   classNames={{
-                    input: "text-white text-xl text-right",
-                    inputWrapper: "bg-white/10 border-white/20",
+                    input: "text-gray-900 text-xl text-right",
                   }}
                 />
               </div>
@@ -228,8 +219,8 @@ export default function PrivateSwapPage() {
             <div className="flex justify-center my-4">
               <Button
                 isIconOnly
-                variant="flat"
-                className="bg-white/10 border border-white/20 text-white hover:bg-white/20"
+                variant="light"
+                className="bg-gray-100 text-gray-600 hover:bg-gray-200"
                 onClick={handleFlipTokens}
               >
                 <ArrowDownUp className="w-5 h-5" />
@@ -239,8 +230,8 @@ export default function PrivateSwapPage() {
             {/* Output Token */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-slate-400 text-sm">You receive</span>
-                <span className="text-slate-400 text-xs flex items-center gap-1">
+                <span className="text-gray-600 text-sm">You receive</span>
+                <span className="text-gray-500 text-xs flex items-center gap-1">
                   <EyeOff className="w-3 h-3" /> Hidden until execution
                 </span>
               </div>
@@ -249,10 +240,7 @@ export default function PrivateSwapPage() {
                   selectedKeys={[outputToken]}
                   onChange={(e) => setOutputToken(e.target.value)}
                   className="w-32"
-                  classNames={{
-                    trigger: "bg-white/10 border-white/20 text-white",
-                    value: "text-white",
-                  }}
+                  variant="bordered"
                 >
                   {TOKENS.filter((t) => t.id !== inputToken).map((token) => (
                     <SelectItem key={token.id} value={token.id}>
@@ -260,8 +248,8 @@ export default function PrivateSwapPage() {
                     </SelectItem>
                   ))}
                 </Select>
-                <div className="flex-1 bg-white/5 rounded-xl border border-white/10 px-4 py-3 text-right">
-                  <span className="text-white text-xl font-mono">
+                <div className="flex-1 bg-gray-50 rounded-xl border border-gray-200 px-4 py-3 text-right">
+                  <span className="text-gray-900 text-xl font-mono">
                     ~{estimatedOutput}
                   </span>
                 </div>
@@ -270,20 +258,16 @@ export default function PrivateSwapPage() {
 
             {/* Advanced Settings */}
             {showAdvanced && (
-              <div className="mb-6 p-4 bg-white/5 rounded-xl border border-white/10">
+              <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-slate-400 text-sm">Slippage Tolerance</span>
+                  <span className="text-gray-600 text-sm">Slippage Tolerance</span>
                   <div className="flex gap-2">
                     {["0.1", "0.5", "1.0"].map((val) => (
                       <Button
                         key={val}
                         size="sm"
                         variant={slippage === val ? "solid" : "flat"}
-                        className={
-                          slippage === val
-                            ? "bg-cyan-600"
-                            : "bg-white/10 text-white"
-                        }
+                        color={slippage === val ? "primary" : "default"}
                         onClick={() => setSlippage(val)}
                       >
                         {val}%
@@ -295,35 +279,36 @@ export default function PrivateSwapPage() {
             )}
 
             {/* Swap Info */}
-            <div className="space-y-2 mb-6 p-4 bg-white/5 rounded-xl border border-white/10">
+            <div className="space-y-2 mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">Rate</span>
-                <span className="text-white">
+                <span className="text-gray-600">Rate</span>
+                <span className="text-gray-900">
                   1 {inputToken.toUpperCase()} ≈{" "}
                   {inputToken === "sol" ? "180" : "0.0055"}{" "}
                   {outputToken.toUpperCase()}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">Price Impact</span>
-                <span className="text-emerald-400">{priceImpact}</span>
+                <span className="text-gray-600">Price Impact</span>
+                <span className="text-emerald-600">{priceImpact}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">Network Fee</span>
-                <span className="text-white">~0.00025 SOL</span>
+                <span className="text-gray-600">Network Fee</span>
+                <span className="text-gray-900">~0.00025 SOL</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">Protocol Fee</span>
-                <span className="text-white">0.3%</span>
+                <span className="text-gray-600">Protocol Fee</span>
+                <span className="text-gray-900">0.3%</span>
               </div>
             </div>
 
             {/* Swap Button */}
             {!connected ? (
-              <WalletMultiButton className="!w-full !bg-gradient-to-r !from-cyan-600 !to-blue-600 !rounded-xl !h-12 !justify-center" />
+              <WalletMultiButton className="!w-full !bg-primary !rounded-xl !h-12 !justify-center" />
             ) : (
               <Button
-                className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-semibold h-12"
+                color="primary"
+                className="w-full font-semibold h-12"
                 onClick={handleSwap}
                 isDisabled={!inputAmount || isSwapping || inputToken === outputToken}
                 isLoading={isSwapping}
@@ -342,11 +327,11 @@ export default function PrivateSwapPage() {
         </Card>
 
         {/* How It Works */}
-        <Card className="bg-white/5 border border-white/10 mt-6">
+        <Card className="bg-white border border-gray-200 shadow-sm rounded-3xl mt-4">
           <CardBody className="p-4">
             <div className="flex items-center gap-2 mb-3">
-              <Info className="w-4 h-4 text-cyan-400" />
-              <span className="text-white font-medium text-sm">
+              <Info className="w-4 h-4 text-primary" />
+              <span className="text-gray-900 font-medium text-sm">
                 How Private Swap Works
               </span>
             </div>
@@ -358,10 +343,10 @@ export default function PrivateSwapPage() {
                 { icon: <Check className="w-4 h-4" />, text: "Settle" },
               ].map((step, i) => (
                 <div key={i} className="flex flex-col items-center gap-1">
-                  <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-cyan-400">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                     {step.icon}
                   </div>
-                  <span className="text-slate-400">{step.text}</span>
+                  <span className="text-gray-600">{step.text}</span>
                 </div>
               ))}
             </div>
@@ -370,27 +355,27 @@ export default function PrivateSwapPage() {
       </div>
 
       {/* Success Modal */}
-      <Modal isOpen={isOpen} onClose={onClose} className="bg-slate-900">
+      <Modal isOpen={isOpen} onClose={onClose}>
         <ModalContent>
-          <ModalHeader className="text-white">Swap Successful!</ModalHeader>
+          <ModalHeader className="text-gray-900">Swap Successful!</ModalHeader>
           <ModalBody>
             <div className="text-center py-4">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary flex items-center justify-center">
                 <Check className="w-8 h-8 text-white" />
               </div>
-              <p className="text-slate-300 mb-4">
+              <p className="text-gray-600 mb-4">
                 Your private swap has been executed successfully.
               </p>
-              <div className="bg-white/5 rounded-xl p-4 text-left">
+              <div className="bg-gray-50 rounded-xl p-4 text-left border border-gray-200">
                 <div className="flex justify-between mb-2">
-                  <span className="text-slate-400">Sent</span>
-                  <span className="text-white">
+                  <span className="text-gray-600">Sent</span>
+                  <span className="text-gray-900">
                     {inputAmount} {inputToken.toUpperCase()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Received</span>
-                  <span className="text-emerald-400">
+                  <span className="text-gray-600">Received</span>
+                  <span className="text-emerald-600">
                     ~{estimatedOutput} {outputToken.toUpperCase()}
                   </span>
                 </div>
@@ -399,7 +384,8 @@ export default function PrivateSwapPage() {
           </ModalBody>
           <ModalFooter>
             <Button
-              className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white"
+              color="primary"
+              className="w-full"
               onClick={onClose}
             >
               Done
@@ -410,4 +396,7 @@ export default function PrivateSwapPage() {
     </div>
   );
 }
+
+
+
 

@@ -10,3 +10,6 @@ echo "Checking results..."
 ls -la target/deploy/*.so 2>/dev/null || echo "No .so files found"
 ls -la target/idl/*.json 2>/dev/null || echo "No IDL files found"
 
+
+
+

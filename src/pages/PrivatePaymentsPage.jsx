@@ -5,21 +5,20 @@ import toast from "react-hot-toast";
 import * as anchor from "@coral-xyz/anchor";
 import { randomBytes } from "crypto";
 import { useNavigate } from "react-router-dom";
+import { ARCIUM_PROGRAM_ID, PRIVATE_PAY_PROGRAM_ID } from "../lib/arcium/constants.js";
+import { useArciumClient, getPrivatePayProgram } from "../lib/arcium/index.js";
 import {
-  awaitComputationFinalization,
-  getClockAccAddress,
-  getCompDefAccOffset,
-  getCompDefAccAddress,
-  getComputationAccAddress,
-  getExecutingPoolAccAddress,
-  getFeePoolAccAddress,
-  getMempoolAccAddress,
-  getArciumEnv,
-} from "@arcium-hq/client";
-
-import { ARCIUM_PROGRAM_ID, PRIVATE_PAY_PROGRAM_ID } from "@/lib/arcium/constants";
-import { useArciumClient, getPrivatePayProgram } from "@/lib/arcium";
-import { Icons } from "@/components/shared/Icons.jsx";
+  getArciumEnvSafe,
+  getClockAccAddressSafe,
+  getCompDefAccOffsetSafe,
+  getCompDefAccAddressSafe,
+  getComputationAccAddressSafe,
+  getExecutingPoolAccAddressSafe,
+  getFeePoolAccAddressSafe,
+  getMempoolAccAddressSafe,
+  awaitComputationFinalizationSafe,
+} from "../lib/arcium/env.js";
+import { Icons } from "../components/shared/Icons.jsx";
 
 // SIGN_PDA_SEED from arcium-anchor derive_seed!(SignerAccount)
 const SIGN_PDA_SEED = "SignerAccount";
@@ -37,17 +36,43 @@ export default function PrivatePaymentsPage() {
     return arciumClient.provider;
   }, [arciumClient]);
 
-  const program = useMemo(() => getPrivatePayProgram(provider), [provider]);
+  const program = useMemo(() => {
+    if (!provider) return null;
+    try {
+      return getPrivatePayProgram(provider);
+    } catch (error) {
+      console.error("Failed to get Private Pay Program:", error);
+      return null;
+    }
+  }, [provider]);
 
   const ensureReady = () => {
     if (!connected || !publicKey) {
       toast.error("Cüzdan bağlayın.");
       return false;
     }
-    if (!arciumClient || !program) {
-      toast.error("Arcium client ya da program hazır değil.");
+    
+    if (!arciumClient) {
+      if (!connected) {
+        toast.error("Cüzdan bağlayın.");
+      } else if (!publicKey) {
+        toast.error("Cüzdan adresi alınamadı.");
+      } else {
+        toast.error("Arcium client oluşturulamadı. Lütfen sayfayı yenileyin.");
+      }
       return false;
     }
+    
+    if (!program) {
+      toast.error("Program yüklenemedi. Program ID kontrol edin.");
+      return false;
+    }
+    
+    if (!PRIVATE_PAY_PROGRAM_ID) {
+      toast.error("Private Pay Program ID yapılandırılmamış.");
+      return false;
+    }
+    
     return true;
   };
 
@@ -68,8 +93,8 @@ export default function PrivatePaymentsPage() {
   };
 
   const deriveCompDef = (ixName) => {
-    const offset = getCompDefAccOffset(ixName); // returns number
-    return getCompDefAccAddress(PRIVATE_PAY_PROGRAM_ID, offset);
+    const offset = getCompDefAccOffsetSafe(ixName);
+    return getCompDefAccAddressSafe(PRIVATE_PAY_PROGRAM_ID, offset);
   };
 
   const handleInitBalance = async () => {
@@ -80,16 +105,16 @@ export default function PrivatePaymentsPage() {
       const compOffset = new anchor.BN(randomBytes(8), "hex");
       const nonce = new anchor.BN(randomBytes(16), "hex");
 
-      const env = getArciumEnv();
+      const env = getArciumEnvSafe();
       const signPda = deriveSignPda();
       const balancePda = deriveBalancePda(publicKey);
       const compDef = deriveCompDef("init_balance");
-      const mempool = getMempoolAccAddress(env.arciumClusterOffset);
-      const executingPool = getExecutingPoolAccAddress(env.arciumClusterOffset);
+      const mempool = getMempoolAccAddressSafe(env.arciumClusterOffset);
+      const executingPool = getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
       const clusterAccount = arciumClient.clusterAccount;
-      const feePool = getFeePoolAccAddress(env.arciumClusterOffset);
-      const clockAcc = getClockAccAddress(env.arciumClusterOffset);
-      const computationAcc = getComputationAccAddress(env.arciumClusterOffset, compOffset);
+      const feePool = getFeePoolAccAddressSafe(env.arciumClusterOffset);
+      const clockAcc = getClockAccAddressSafe(env.arciumClusterOffset);
+      const computationAcc = getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
 
       const tx = await program.methods
         .createBalanceAccount(compOffset, nonce)
@@ -115,7 +140,7 @@ export default function PrivatePaymentsPage() {
       toast.success(`Tx gönderildi: ${sig}`);
 
       toast.loading("MPC hesaplaması bekleniyor...");
-      await awaitComputationFinalization(provider, compOffset, PRIVATE_PAY_PROGRAM_ID, "confirmed");
+      await awaitComputationFinalizationSafe(provider.connection, compOffset, PRIVATE_PAY_PROGRAM_ID, "confirmed");
       toast.success("Init balance tamamlandı.");
     } catch (e) {
       console.error(e);
@@ -137,16 +162,16 @@ export default function PrivatePaymentsPage() {
       const compOffset = new anchor.BN(randomBytes(8), "hex");
       const amountBn = new anchor.BN(amount);
 
-      const env = getArciumEnv();
+      const env = getArciumEnvSafe();
       const signPda = deriveSignPda();
       const balancePda = deriveBalancePda(publicKey);
       const compDef = deriveCompDef("deposit");
-      const mempool = getMempoolAccAddress(env.arciumClusterOffset);
-      const executingPool = getExecutingPoolAccAddress(env.arciumClusterOffset);
+      const mempool = getMempoolAccAddressSafe(env.arciumClusterOffset);
+      const executingPool = getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
       const clusterAccount = arciumClient.clusterAccount;
-      const feePool = getFeePoolAccAddress(env.arciumClusterOffset);
-      const clockAcc = getClockAccAddress(env.arciumClusterOffset);
-      const computationAcc = getComputationAccAddress(env.arciumClusterOffset, compOffset);
+      const feePool = getFeePoolAccAddressSafe(env.arciumClusterOffset);
+      const clockAcc = getClockAccAddressSafe(env.arciumClusterOffset);
+      const computationAcc = getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
 
       const tx = await program.methods
         .depositFunds(compOffset, amountBn)
@@ -173,7 +198,7 @@ export default function PrivatePaymentsPage() {
       toast.success(`Tx gönderildi: ${sig}`);
 
       toast.loading("MPC hesaplaması bekleniyor...");
-      await awaitComputationFinalization(provider, compOffset, PRIVATE_PAY_PROGRAM_ID, "confirmed");
+      await awaitComputationFinalizationSafe(provider.connection, compOffset, PRIVATE_PAY_PROGRAM_ID, "confirmed");
       toast.success("Deposit tamamlandı.");
     } catch (e) {
       console.error(e);
@@ -184,46 +209,75 @@ export default function PrivatePaymentsPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-start justify-center py-16 px-4 md:px-10">
-      <div className="relative flex flex-col gap-4 w-full max-w-md items-start justify-center bg-[#F9F9FA] rounded-[24px] p-6">
-        <div className="flex items-center justify-between w-full mb-2">
-          <h1 className="font-bold text-lg text-[#19191B]">Private Payments</h1>
-          <Button
-            onClick={() => navigate("/arcium")}
-            className="bg-white rounded-full px-4 h-10 flex items-center gap-2"
-            variant="flat"
-          >
-            <Icons.back className="size-4" />
-            <span className="text-sm">Back</span>
-          </Button>
-        </div>
-
-        <Card className="w-full p-4">
+    <div className="flex min-h-screen w-full items-start justify-center py-20 px-4 md:px-10 bg-gradient-to-br from-white to-indigo-50/30">
+      <div className="relative flex flex-col gap-4 w-full max-w-md">
+        <Card className="bg-white border border-gray-200 shadow-sm rounded-3xl p-6">
           <CardBody className="flex flex-col gap-4">
-            <div className="text-xs text-gray-500">
-              Arcium Program: {ARCIUM_PROGRAM_ID?.toBase58?.() ?? "auto"}
-              <br />
-              Private Pay Program: {PRIVATE_PAY_PROGRAM_ID?.toBase58?.()}
+            <div className="flex items-center justify-between w-full mb-2">
+              <h1 className="font-bold text-xl text-gray-900">Private Payments</h1>
+              <Button
+                onClick={() => navigate("/arcium")}
+                className="bg-white border border-gray-200 rounded-full px-4 h-10 flex items-center gap-2"
+                variant="flat"
+              >
+                <Icons.back className="size-4" />
+                <span className="text-sm">Back</span>
+              </Button>
             </div>
 
-            <Button color="secondary" onClick={handleInitBalance} isLoading={loading} isDisabled={!connected}>
-              Init Balance Account
-            </Button>
+            {!connected ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <p className="text-gray-500 text-center mb-4">
+                  Connect your Solana wallet to use private payments
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg space-y-1">
+                  <div className="font-medium mb-2">Debug Info:</div>
+                  <div>Connected: {connected ? "✓" : "✗"}</div>
+                  <div>Public Key: {publicKey?.toBase58()?.slice(0, 8) + "..." ?? "N/A"}</div>
+                  <div>Arcium Client: {arciumClient ? "✓" : "✗"}</div>
+                  <div>Program: {program ? "✓" : "✗"}</div>
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="font-medium mb-1">Program IDs:</div>
+                    <div>Arcium: {ARCIUM_PROGRAM_ID?.toBase58?.() ?? "N/A"}</div>
+                    <div>Private Pay: {PRIVATE_PAY_PROGRAM_ID?.toBase58?.() ?? "N/A"}</div>
+                  </div>
+                </div>
 
-            <Input
-              label="Deposit Amount (lamports)"
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0"
-            />
-            <Button color="primary" onClick={handleDeposit} isLoading={loading} isDisabled={!connected}>
-              Deposit
-            </Button>
+                <Button 
+                  color="primary" 
+                  onClick={handleInitBalance} 
+                  isLoading={loading} 
+                  isDisabled={!connected}
+                  className="w-full"
+                >
+                  Init Balance Account
+                </Button>
+
+                <Input
+                  label="Deposit Amount (lamports)"
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0"
+                  variant="bordered"
+                />
+                <Button 
+                  color="primary" 
+                  onClick={handleDeposit} 
+                  isLoading={loading} 
+                  isDisabled={!connected}
+                  className="w-full"
+                >
+                  Deposit
+                </Button>
+              </>
+            )}
           </CardBody>
         </Card>
       </div>
     </div>
   );
 }
-

@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -18,29 +19,53 @@ export default defineConfig(({ mode }) => {
             protocol: "ws",
           },
         }
-      : {};
+      : {
+          strictPort: false,
+        };
+
   return {
     plugins: [
       react(),
       svgr(),
-      // Node polyfills for Solana web3.js and Arcium client
       nodePolyfills({
-        include: ["buffer", "crypto", "stream", "util"],
         globals: {
           Buffer: true,
           global: true,
           process: true,
         },
+        protocolImports: true,
       }),
     ],
     server: serverConfig,
     define: {
       "process.env": {},
+      global: "globalThis",
     },
     resolve: {
       alias: {
-        // Polyfill for node crypto in browser
-        crypto: "crypto-browserify",
+        "@": path.resolve(__dirname, "./src"),
+        // Override nested readable-stream in ripemd160/hash-base
+        "readable-stream": "readable-stream",
+      },
+    },
+    optimizeDeps: {
+      include: [
+        "readable-stream",
+        "buffer",
+      ],
+      esbuildOptions: {
+        define: {
+          global: "globalThis",
+        },
+      },
+    },
+    build: {
+      commonjsOptions: {
+        transformMixedEsModules: true,
+        include: [/node_modules/],
+      },
+      rollupOptions: {
+        plugins: [],
       },
     },
   };

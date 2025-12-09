@@ -15,6 +15,7 @@ import SendPage from "./pages/SendPage.jsx";
 import ArciumDashboard from "./pages/ArciumDashboard.jsx";
 import PrivateSwapPage from "./pages/PrivateSwapPage.jsx";
 import DarkPoolPage from "./pages/DarkPoolPage.jsx";
+import PrivatePaymentsPage from "./pages/PrivatePaymentsPage.jsx";
 
 const EXCLUDED_SUBDOMAINS = [
   "www",
@@ -116,7 +117,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/arcium/payments",
-        element: <ArciumDashboard />, // Will add dedicated page later
+        element: <PrivatePaymentsPage />,
       },
     ],
   },

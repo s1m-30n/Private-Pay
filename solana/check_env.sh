@@ -13,3 +13,6 @@ echo "Solana Balance: $(solana balance --url devnet 2>&1)"
 echo ""
 echo "==========================================="
 
+
+
+

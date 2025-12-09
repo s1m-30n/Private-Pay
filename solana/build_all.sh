@@ -42,3 +42,6 @@ ls -la target/deploy/*.so 2>&1 || echo "No .so files found"
 ls -la target/deploy/*.json 2>&1 || echo "No .json files found"
 ls -la target/idl/*.json 2>&1 || echo "No IDL files found"
 
+
+
+

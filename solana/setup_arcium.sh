@@ -34,3 +34,6 @@ solana airdrop 2 || echo "Airdrop might have failed (rate limited)"
 echo ""
 echo "=== Setup complete ==="
 
+
+
+

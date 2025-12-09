@@ -24,3 +24,6 @@ echo "Balance: $(solana balance 2>&1)"
 echo ""
 echo "========================================="
 
+
+
+
