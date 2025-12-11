@@ -11,7 +11,6 @@ import { Icons } from "../../shared/Icons.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAptos } from "../../../providers/AptosProvider.jsx";
 import { getUserBalance, registerUser } from "../../../lib/supabase.js";
-import PhotonWalletDisplay from "../../shared/PhotonWalletDisplay.jsx";
 import BalanceChart from "./BalanceChart.jsx";
 
 export default function Dashboard() {
@@ -66,7 +65,6 @@ export default function Dashboard() {
             <ReceiveCard setOpenQr={setOpenQr} />
             <MergedBalanceCard balance={balance} isLoading={isLoadingBalance} />
             <PaymentLinksDashboard />
-            <PhotonWalletDisplay />
           </div>
         </div>
       </motion.div>

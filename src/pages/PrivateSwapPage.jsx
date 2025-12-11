@@ -178,9 +178,9 @@ export default function PrivateSwapPage() {
     return pda;
   };
 
-  const deriveCompDef = (ixName) => {
+  const deriveCompDef = async (ixName) => {
     const offset = getCompDefAccOffsetSafe(ixName);
-    return getCompDefAccAddressSafe(PRIVATE_PAY_PROGRAM_ID, offset);
+    return await getCompDefAccAddressSafe(PRIVATE_PAY_PROGRAM_ID, offset);
   };
 
   // Execute swap
@@ -225,18 +225,18 @@ export default function PrivateSwapPage() {
       const compOffset = new anchor.BN(randomBytes(8), "hex");
       const nonceU128 = new anchor.BN(nonce, "le");
 
-      const env = getArciumEnvSafe();
+      const env = await getArciumEnvSafe();
       const signPda = deriveSignPda();
       const tokenA = inputToken === "sol" ? 1 : 2;
       const tokenB = outputToken === "usdc" ? 2 : 1;
       const swapPoolPda = deriveSwapPoolPda(tokenA, tokenB);
-      const compDef = deriveCompDef("execute_swap");
-      const mempool = getMempoolAccAddressSafe(env.arciumClusterOffset);
-      const executingPool = getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
+      const compDef = await deriveCompDef("execute_swap");
+      const mempool = await getMempoolAccAddressSafe(env.arciumClusterOffset);
+      const executingPool = await getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
       const clusterAccount = arciumClient.clusterAccount;
-      const feePool = getFeePoolAccAddressSafe(env.arciumClusterOffset);
-      const clockAcc = getClockAccAddressSafe(env.arciumClusterOffset);
-      const computationAcc = getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
+      const feePool = await getFeePoolAccAddressSafe(env.arciumClusterOffset);
+      const clockAcc = await getClockAccAddressSafe(env.arciumClusterOffset);
+      const computationAcc = await getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
 
       const tx = await program.methods
         .executeSwap(

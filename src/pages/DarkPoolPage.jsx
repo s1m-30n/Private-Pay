@@ -165,9 +165,9 @@ export default function DarkPoolPage() {
     return pda;
   };
 
-  const deriveCompDef = (ixName) => {
+  const deriveCompDef = async (ixName) => {
     const offset = getCompDefAccOffsetSafe(ixName);
-    return getCompDefAccAddressSafe(PRIVATE_PAY_PROGRAM_ID, offset);
+    return await getCompDefAccAddressSafe(PRIVATE_PAY_PROGRAM_ID, offset);
   };
 
   // Stats
@@ -234,16 +234,16 @@ export default function DarkPoolPage() {
       const compOffset = new anchor.BN(randomBytes(8), "hex");
       const nonceU128 = new anchor.BN(nonce, "le");
 
-      const env = getArciumEnvSafe();
+      const env = await getArciumEnvSafe();
       const signPda = deriveSignPda();
       const orderBookPda = deriveOrderBookPda(selectedPair);
-      const compDef = deriveCompDef("place_order");
-      const mempool = getMempoolAccAddressSafe(env.arciumClusterOffset);
-      const executingPool = getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
+      const compDef = await deriveCompDef("place_order");
+      const mempool = await getMempoolAccAddressSafe(env.arciumClusterOffset);
+      const executingPool = await getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
       const clusterAccount = arciumClient.clusterAccount;
-      const feePool = getFeePoolAccAddressSafe(env.arciumClusterOffset);
-      const clockAcc = getClockAccAddressSafe(env.arciumClusterOffset);
-      const computationAcc = getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
+      const feePool = await getFeePoolAccAddressSafe(env.arciumClusterOffset);
+      const clockAcc = await getClockAccAddressSafe(env.arciumClusterOffset);
+      const computationAcc = await getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
 
       const tx = await program.methods
         .placeOrder(
@@ -334,16 +334,16 @@ export default function DarkPoolPage() {
       const compOffset = new anchor.BN(randomBytes(8), "hex");
       const nonceU128 = new anchor.BN(nonce, "le");
 
-      const env = getArciumEnvSafe();
+      const env = await getArciumEnvSafe();
       const signPda = deriveSignPda();
       const orderBookPda = deriveOrderBookPda(selectedPair);
-      const compDef = deriveCompDef("match_orders");
-      const mempool = getMempoolAccAddressSafe(env.arciumClusterOffset);
-      const executingPool = getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
+      const compDef = await deriveCompDef("match_orders");
+      const mempool = await getMempoolAccAddressSafe(env.arciumClusterOffset);
+      const executingPool = await getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
       const clusterAccount = arciumClient.clusterAccount;
-      const feePool = getFeePoolAccAddressSafe(env.arciumClusterOffset);
-      const clockAcc = getClockAccAddressSafe(env.arciumClusterOffset);
-      const computationAcc = getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
+      const feePool = await getFeePoolAccAddressSafe(env.arciumClusterOffset);
+      const clockAcc = await getClockAccAddressSafe(env.arciumClusterOffset);
+      const computationAcc = await getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
 
       const tx = await program.methods
         .matchOrders(

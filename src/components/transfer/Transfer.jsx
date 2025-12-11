@@ -16,7 +16,6 @@ import { BN } from "bn.js";
 import { confirmTransaction, handleKeyDown } from "./helpers.js";
 import { formatCurrency } from "@coingecko/cryptoformat";
 import { poolTransfer } from "../../lib/cBridge/cBridge.js";
-import { usePhoton } from "../../providers/PhotonProvider.jsx";
 
 // Make it so that the oasis sapphire (chainId: 23294) shows up on ChainSelectionDialog only when the exact token is selected
 const SUPPORTED_SAPPHIRE_BRIDGE = [
@@ -42,7 +41,6 @@ export function Transfer() {
   const { assets, isAssetsLoading } = useUser();
   const { contract } = useWeb3();
   const navigate = useNavigate();
-  const { trackRewardedEvent } = usePhoton();
 
   // State variables
   const [amount, setAmount] = useState("");
@@ -411,16 +409,6 @@ export function Transfer() {
         toast.success("Withdrawal completed successfully", {
           id: "withdrawal",
         });
-
-        // Track rewarded event for successful transfer
-        trackRewardedEvent("transfer_completed", {
-          transferType: "public",
-          amount: parseFloat(amount),
-          tokenSymbol: selectedToken?.nativeToken ? selectedToken.nativeToken.symbol : selectedToken.token.symbol,
-          chainId: selectedChain.id,
-          chainName: selectedChain.name,
-          txCount: txReceipts.length,
-        });
       } else if (isDifferentChain === true) {
         // Handle cross-chain transfer
         let txReceipts = [];
@@ -489,16 +477,6 @@ export function Transfer() {
         setOpenSuccess(true);
         toast.success("Withdrawal completed successfully", {
           id: "withdrawal",
-        });
-
-        // Track rewarded event for successful cross-chain transfer
-        trackRewardedEvent("transfer_completed", {
-          transferType: "private_cross_chain",
-          amount: parseFloat(amount),
-          tokenSymbol: selectedToken?.nativeToken ? selectedToken.nativeToken.symbol : selectedToken.token.symbol,
-          sourceChainId: transferData.sourceChainId,
-          destinationChainId: transferData.chainId,
-          txCount: txReceipts.length,
         });
       }
     } catch (error) {

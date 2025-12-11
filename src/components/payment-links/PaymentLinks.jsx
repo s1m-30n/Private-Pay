@@ -13,14 +13,12 @@ import { useAptos } from "../../providers/AptosProvider.jsx";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Icons } from "../shared/Icons.jsx";
-import { usePhoton } from "../../providers/PhotonProvider.jsx";
 import { getPaymentLinks } from "../../lib/supabase.js";
 
 export default function PaymentLinks() {
   const navigate = useNavigate();
   const [, setOpen] = useAtom(isCreateLinkDialogAtom);
   const { account } = useAptos();
-  const { trackUnrewardedEvent } = usePhoton();
   const [paymentLinks, setPaymentLinks] = useState([]);
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -70,12 +68,6 @@ export default function PaymentLinks() {
   const handleCopyLink = (alias) => {
     navigator.clipboard.writeText(`${alias}.privatepay.me`);
     toast.success("Link copied to clipboard!");
-    
-    // Track unrewarded event for attribution
-    trackUnrewardedEvent("payment_link_copied", {
-      alias: alias,
-      username: username,
-    });
   };
 
   return (

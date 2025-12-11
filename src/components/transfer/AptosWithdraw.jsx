@@ -5,13 +5,11 @@ import { getUserBalance } from "../../lib/supabase";
 import toast from "react-hot-toast";
 import { Icons } from "../shared/Icons";
 import { useNavigate } from "react-router-dom";
-import { usePhoton } from "../../providers/PhotonProvider.jsx";
 import SuccessDialog from "../dialogs/SuccessDialog.jsx";
 
 export function AptosWithdraw() {
   const { account, isConnected, connect } = useAptos();
   const navigate = useNavigate();
-  const { trackRewardedEvent } = usePhoton();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingBalance, setIsLoadingBalance] = useState(true);
   const [amount, setAmount] = useState("");
@@ -203,14 +201,6 @@ export function AptosWithdraw() {
 
       // Trigger balance update
       window.dispatchEvent(new Event('balance-updated'));
-
-      // Track rewarded event for successful withdrawal
-      trackRewardedEvent("aptos_withdrawal_completed", {
-        amount: parseFloat(amount),
-        tokenSymbol: "APT",
-        destinationAddress: destinationAddress.slice(0, 10),
-        txHash: committedTxn.hash.slice(0, 10),
-      }, account);
 
       // Show success dialog with spy video
       const successDataObj = {

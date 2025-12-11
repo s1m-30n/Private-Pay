@@ -4,7 +4,6 @@ import { useAptos } from "../../providers/AptosProvider";
 import { sendAptosStealthPayment, getAptosClient, getAptosMetaAddressFromChain } from "../../lib/aptos";
 import { generateStealthAddress, generateEphemeralKeyPair, validatePublicKey, hexToBytes } from "../../lib/aptos/stealthAddress";
 import toast from "react-hot-toast";
-import { usePhoton } from "../../providers/PhotonProvider.jsx";
 import SuccessDialog from "../dialogs/SuccessDialog.jsx";
 
 /**
@@ -13,7 +12,6 @@ import SuccessDialog from "../dialogs/SuccessDialog.jsx";
  */
 export default function AptosSendPayment({ recipientAddress, recipientMetaIndex = 0 }) {
   const { account, isConnected } = useAptos();
-  const { trackRewardedEvent } = usePhoton();
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [amount, setAmount] = useState("");
@@ -175,15 +173,6 @@ export default function AptosSendPayment({ recipientAddress, recipientMetaIndex 
       } else {
         toast.success("Payment sent successfully!", { duration: 5000 });
       }
-
-      // Track rewarded event for successful stealth payment
-      trackRewardedEvent("aptos_stealth_payment_sent", {
-        amount: amountOctas,
-        tokenSymbol: "APT",
-        recipientAddress: recipientAddress?.slice(0, 10) || "self",
-        stealthAddress: stealthAddress.slice(0, 10),
-        txHash: txHash.slice(0, 10),
-      }, account);
 
       // Show success dialog with spy video
       const successDataObj = {

@@ -5,7 +5,6 @@ import { useLoaderData, useParams } from "react-router-dom";
 import { useAptos } from "../../providers/AptosProvider.jsx";
 import { getPaymentLinkByAlias, getUserByUsername, recordPayment } from "../../lib/supabase.js";
 import { sendAptTransfer } from "../../lib/aptos.js";
-import { usePhoton } from "../../providers/PhotonProvider.jsx";
 import SuccessDialog from "../dialogs/SuccessDialog.jsx";
 import { Icons } from "../shared/Icons.jsx";
 
@@ -15,7 +14,6 @@ export default function Payment() {
   const loaderData = useLoaderData();
   const { alias_url } = useParams();
   const { account, isConnected, connect } = useAptos();
-  const { trackRewardedEvent, trackUnrewardedEvent } = usePhoton();
 
   const alias = loaderData ? loaderData.subdomain : alias_url;
 
@@ -50,21 +48,11 @@ export default function Payment() {
           // Get recipient user data
           const recipient = await getUserByUsername(paymentLink.username);
           setRecipientData(recipient);
-          
-          // Track unrewarded event for payment page view
-          trackUnrewardedEvent("payment_page_viewed", {
-            alias: alias,
-            recipientUsername: paymentLink.username,
-          });
         } else {
           // If not found as payment link, try as username
           const recipient = await getUserByUsername(alias);
           if (recipient) {
             setRecipientData(recipient);
-            trackUnrewardedEvent("payment_page_viewed", {
-              alias: alias,
-              recipientUsername: alias,
-            });
           } else {
             setError("Payment link not found. Please check the URL and try again.");
           }
@@ -78,7 +66,7 @@ export default function Payment() {
     }
 
     fetchPaymentLink();
-  }, [alias, trackUnrewardedEvent]);
+  }, [alias]);
 
   const handleConnectWallet = async () => {
     try {
@@ -154,15 +142,6 @@ export default function Payment() {
         ),
         { duration: 8000 }
       );
-
-      // Track rewarded event for successful payment
-      trackRewardedEvent("aptos_payment_link_payment_sent", {
-        amount: parseFloat(amount),
-        tokenSymbol: "APT",
-        recipientUsername: recipientUsername,
-        alias: alias,
-        txHash: result.hash.slice(0, 10),
-      }, account);
 
       // Show success dialog
       const successDataObj = {

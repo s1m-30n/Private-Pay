@@ -104,9 +104,9 @@ export default function PrivatePaymentsPage() {
     return pda;
   };
 
-  const deriveCompDef = (ixName) => {
+  const deriveCompDef = async (ixName) => {
     const offset = getCompDefAccOffsetSafe(ixName);
-    return getCompDefAccAddressSafe(PRIVATE_PAY_PROGRAM_ID, offset);
+    return await getCompDefAccAddressSafe(PRIVATE_PAY_PROGRAM_ID, offset);
   };
 
   const handleInitBalance = async () => {
@@ -117,16 +117,16 @@ export default function PrivatePaymentsPage() {
       const compOffset = randomBN(8);
       const nonce = randomBN(16);
 
-      const env = getArciumEnvSafe();
+      const env = await getArciumEnvSafe();
       const signPda = deriveSignPda();
       const balancePda = deriveBalancePda(publicKey);
-      const compDef = deriveCompDef("init_balance");
-      const mempool = getMempoolAccAddressSafe(env.arciumClusterOffset);
-      const executingPool = getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
+      const compDef = await deriveCompDef("init_balance");
+      const mempool = await getMempoolAccAddressSafe(env.arciumClusterOffset);
+      const executingPool = await getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
       const clusterAccount = arciumClient.clusterAccount;
-      const feePool = getFeePoolAccAddressSafe(env.arciumClusterOffset);
-      const clockAcc = getClockAccAddressSafe(env.arciumClusterOffset);
-      const computationAcc = getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
+      const feePool = await getFeePoolAccAddressSafe(env.arciumClusterOffset);
+      const clockAcc = await getClockAccAddressSafe(env.arciumClusterOffset);
+      const computationAcc = await getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
 
       // Log all accounts for debugging
       console.log("\n=== ACCOUNT CHECK ===");
@@ -239,16 +239,16 @@ export default function PrivatePaymentsPage() {
       const compOffset = randomBN(8);
       const amountBn = new anchor.BN(amount);
 
-      const env = getArciumEnvSafe();
+      const env = await getArciumEnvSafe();
       const signPda = deriveSignPda();
       const balancePda = deriveBalancePda(publicKey);
-      const compDef = deriveCompDef("deposit");
-      const mempool = getMempoolAccAddressSafe(env.arciumClusterOffset);
-      const executingPool = getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
+      const compDef = await deriveCompDef("deposit");
+      const mempool = await getMempoolAccAddressSafe(env.arciumClusterOffset);
+      const executingPool = await getExecutingPoolAccAddressSafe(env.arciumClusterOffset);
       const clusterAccount = arciumClient.clusterAccount;
-      const feePool = getFeePoolAccAddressSafe(env.arciumClusterOffset);
-      const clockAcc = getClockAccAddressSafe(env.arciumClusterOffset);
-      const computationAcc = getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
+      const feePool = await getFeePoolAccAddressSafe(env.arciumClusterOffset);
+      const clockAcc = await getClockAccAddressSafe(env.arciumClusterOffset);
+      const computationAcc = await getComputationAccAddressSafe(env.arciumClusterOffset, compOffset);
 
       const tx = await program.methods
         .depositFunds(compOffset, amountBn)

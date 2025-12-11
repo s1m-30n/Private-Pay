@@ -1,10 +1,10 @@
 /**
- * JWT Generator Utility for Photon Integration
+ * JWT Generator Utility
  * 
  * NOTE: This is a DEMO implementation for development purposes only.
  * In production, JWTs should be generated and signed by a secure backend server.
  * 
- * This utility creates a simple JWT-like token structure for testing Photon integration.
+ * This utility creates a simple JWT-like token structure.
  */
 
 /**
@@ -48,7 +48,7 @@ function base64UrlEncode(str) {
 }
 
 /**
- * Generates a demo JWT token for Photon authentication
+ * Generates a demo JWT token
  * 
  * @param {string} userId - Unique user identifier
  * @param {string} email - User email address
