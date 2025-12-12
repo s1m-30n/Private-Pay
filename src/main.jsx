@@ -13,6 +13,16 @@ if (typeof window !== "undefined" && typeof window.require === "undefined") {
 
 // Global error handler for uncaught promise rejections
 window.addEventListener('unhandledrejection', (event) => {
+  // Ignore WalletConnect connection errors (non-critical)
+  const reason = event.reason?.message || String(event.reason || '');
+  if (reason.includes('Socket stalled') || 
+      reason.includes('WalletConnect') ||
+      reason.includes('relay.walletconnect')) {
+    // Suppress these warnings - they're non-critical
+    event.preventDefault();
+    return;
+  }
+  
   console.error('[Global] Unhandled promise rejection:', event.reason);
   
   // Check if it's a JSON parse error
