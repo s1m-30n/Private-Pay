@@ -14,6 +14,13 @@ export default function DynamicProvider({ children }) {
 
   // Log Dynamic configuration for debugging
   console.log("[DynamicProvider] Initializing with env ID:", dynamicEnvId ? `${dynamicEnvId.substring(0, 10)}...` : "NOT SET");
+  console.log("[DynamicProvider] Full env check:", {
+    hasEnvId: !!dynamicEnvId,
+    envIdLength: dynamicEnvId?.length || 0,
+    envIdType: typeof dynamicEnvId,
+    isPlaceholder: dynamicEnvId === "your_dynamic_environment_id",
+    isEmpty: dynamicEnvId === "",
+  });
 
   // If Dynamic environment ID is not set or is placeholder, skip Dynamic provider
   if (!dynamicEnvId || dynamicEnvId === "your_dynamic_environment_id" || dynamicEnvId === "") {

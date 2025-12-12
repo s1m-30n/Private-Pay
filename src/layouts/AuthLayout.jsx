@@ -11,6 +11,7 @@ import Payment from "../components/payment/Payment.jsx";
 import PaymentLayout from "./PaymentLayout.jsx";
 import AsciiFlame from "../components/shared/AsciiFlame.jsx";
 import EngowlWatermark from "../components/shared/EngowlWatermark.jsx";
+import EnvDebug from "../components/debug/EnvDebug.jsx";
 
 export default function AuthLayout() {
   const { isSignedIn } = useSession();
@@ -23,7 +24,9 @@ export default function AuthLayout() {
   console.log("[AuthLayout] Dynamic configuration:", {
     hasDynamic,
     dynamicEnvId: dynamicEnvId ? `${dynamicEnvId.substring(0, 10)}...` : "Not set",
+    dynamicEnvIdLength: dynamicEnvId?.length || 0,
     isSignedIn,
+    allEnvVars: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')),
   });
 
   if (subdomain) {
@@ -56,6 +59,7 @@ export default function AuthLayout() {
     console.log("[AuthLayout] User not signed in. Showing login screen with Dynamic widget.");
     return (
       <div className="flex min-h-screen w-full items-center justify-center px-5 md:px-10 bg-primary-50">
+        <EnvDebug />
         <AsciiFlame />
         {/* <EngowlWatermark /> */}
 
@@ -68,8 +72,21 @@ export default function AuthLayout() {
           </div>
 
           {/* Wrap DynamicEmbeddedWidget in error boundary */}
-          <div id="dynamic-widget-container">
-            <DynamicEmbeddedWidget background="with-border" />
+          <div id="dynamic-widget-container" style={{ minHeight: '400px', position: 'relative' }}>
+            {(() => {
+              try {
+                return <DynamicEmbeddedWidget background="with-border" />;
+              } catch (error) {
+                console.error("[AuthLayout] Error rendering DynamicEmbeddedWidget:", error);
+                return (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
+                    <p className="text-red-600 font-semibold">Failed to load authentication widget</p>
+                    <p className="text-red-500 text-sm mt-2">Error: {error.message}</p>
+                    <p className="text-gray-500 text-xs mt-2">Check console for details</p>
+                  </div>
+                );
+              }
+            })()}
           </div>
 
           <div className="flex flex-col items-center mt-2">
