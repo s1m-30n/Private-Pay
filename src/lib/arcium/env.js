@@ -1,153 +1,215 @@
-/**
- * Arcium Environment Utilities
- * 
- * Helper functions for Arcium environment and account management
- */
-
 import { PublicKey } from "@solana/web3.js";
+import { PRIVATE_PAY_PROGRAM_ID } from "./constants.js";
+
+// Cache for Arcium client library
+let arciumLibCache = null;
 
 /**
- * Get Arcium environment safely
+ * Safely get Arcium client library
  */
-export function getArciumEnvSafe() {
-  return import.meta.env.VITE_ARCIUM_ENV || "testnet";
-}
-
-/**
- * Get computation definition account offset safely
- */
-export function getCompDefAccOffsetSafe() {
-  return parseInt(import.meta.env.VITE_ARCIUM_COMP_DEF_OFFSET || "0", 10);
-}
-
-/**
- * Get computation definition account address safely
- */
-export function getCompDefAccAddressSafe(programId, offset = 0) {
-  // Placeholder implementation
-  // Actual implementation depends on Arcium SDK
+async function getArciumLib() {
+  if (arciumLibCache) return arciumLibCache;
+  
   try {
-    // This would use Arcium SDK to derive the account
-    return PublicKey.findProgramAddressSync(
-      [Buffer.from("comp_def"), Buffer.from([offset])],
-      programId
-    )[0];
+    arciumLibCache = await import("@arcium-hq/client");
+    return arciumLibCache;
   } catch (error) {
-    console.error("Error getting comp def account:", error);
+    console.warn("@arcium-hq/client not available:", error);
     return null;
   }
 }
 
 /**
- * Get mempool account address safely
+ * Safe wrapper for getArciumEnv
  */
-export function getMempoolAccAddressSafe(programId) {
+export async function getArciumEnvSafe() {
+  const lib = await getArciumLib();
+  if (!lib || !lib.getArciumEnv) {
+    // Return default devnet environment
+    return {
+      arciumClusterOffset: new Uint8Array([0, 0, 0, 0]), // Default cluster offset
+    };
+  }
+  
   try {
-    return PublicKey.findProgramAddressSync(
-      [Buffer.from("mempool")],
-      programId
-    )[0];
+    return lib.getArciumEnv();
   } catch (error) {
-    console.error("Error getting mempool account:", error);
-    return null;
+    console.warn("Failed to get Arcium env, using defaults:", error);
+    return {
+      arciumClusterOffset: new Uint8Array([0, 0, 0, 0]),
+    };
   }
 }
 
 /**
- * Get executing pool account address safely
+ * Safe wrapper for getCompDefAccOffset
  */
-export function getExecutingPoolAccAddressSafe(programId) {
+export function getCompDefAccOffsetSafe(ixName) {
+  // Map instruction names to offsets
+  // These should match the offsets used in the Solana program
+  const offsetMap = {
+    "init_balance": Buffer.from("init_balance"),
+    "deposit": Buffer.from("deposit"),
+    "send_payment": Buffer.from("send_payment"),
+    "init_pool": Buffer.from("init_pool"),
+    "execute_swap": Buffer.from("execute_swap"),
+    "init_order_book": Buffer.from("init_order_book"),
+    "place_order": Buffer.from("place_order"),
+    "match_orders": Buffer.from("match_orders"),
+  };
+
+  const offset = offsetMap[ixName];
+  if (!offset) {
+    console.warn(`Unknown instruction name: ${ixName}, using default offset`);
+    return Buffer.from(ixName);
+  }
+
+  return offset;
+}
+
+/**
+ * Safe wrapper for getCompDefAccAddress
+ * Returns a Promise that resolves to the PublicKey
+ */
+export async function getCompDefAccAddressSafe(programId, offset) {
+  if (!programId) {
+    throw new Error("Program ID is required");
+  }
+
+  const lib = await getArciumLib();
+  if (!lib || !lib.getCompDefAccAddress) {
+    // Fallback: derive PDA manually
+    const baseSeed = Buffer.from("ComputationDefinitionAccount");
+    const offsetBuffer = Buffer.isBuffer(offset) ? offset : Buffer.from(offset);
+    
+    // Get Arcium program ID
+    const arciumProgramId = lib?.getArciumProgramId?.() || new PublicKey("Arcium1111111111111111111111111111111111111");
+    
+    const [pda] = PublicKey.findProgramAddressSync(
+      [baseSeed, programId.toBuffer(), offsetBuffer],
+      arciumProgramId
+    );
+    return pda;
+  }
+
   try {
-    return PublicKey.findProgramAddressSync(
-      [Buffer.from("executing_pool")],
-      programId
-    )[0];
+    const offsetU32 = Buffer.isBuffer(offset) 
+      ? offset.readUInt32LE(0) 
+      : Buffer.from(offset).readUInt32LE(0);
+    return lib.getCompDefAccAddress(programId, offsetU32);
   } catch (error) {
-    console.error("Error getting executing pool account:", error);
-    return null;
+    console.warn("Failed to get comp def address, using fallback:", error);
+    const baseSeed = Buffer.from("ComputationDefinitionAccount");
+    const offsetBuffer = Buffer.isBuffer(offset) ? offset : Buffer.from(offset);
+    const arciumProgramId = lib.getArciumProgramId?.() || new PublicKey("Arcium1111111111111111111111111111111111111");
+    const [pda] = PublicKey.findProgramAddressSync(
+      [baseSeed, programId.toBuffer(), offsetBuffer],
+      arciumProgramId
+    );
+    return pda;
   }
 }
 
 /**
- * Get fee pool account address safely
+ * Safe wrapper for getMempoolAccAddress
  */
-export function getFeePoolAccAddressSafe(programId) {
-  try {
-    return PublicKey.findProgramAddressSync(
-      [Buffer.from("fee_pool")],
-      programId
-    )[0];
-  } catch (error) {
-    console.error("Error getting fee pool account:", error);
-    return null;
-  }
+export function getMempoolAccAddressSafe(clusterOffset) {
+  return getArciumLib().then((lib) => {
+    if (!lib || !lib.getMempoolAccAddress) {
+      throw new Error("Arcium client not available");
+    }
+    return lib.getMempoolAccAddress(clusterOffset);
+  });
 }
 
 /**
- * Get clock account address safely
+ * Safe wrapper for getExecutingPoolAccAddress
  */
-export function getClockAccAddressSafe(programId) {
-  try {
-    return PublicKey.findProgramAddressSync(
-      [Buffer.from("clock")],
-      programId
-    )[0];
-  } catch (error) {
-    console.error("Error getting clock account:", error);
-    return null;
-  }
+export function getExecutingPoolAccAddressSafe(clusterOffset) {
+  return getArciumLib().then((lib) => {
+    if (!lib || !lib.getExecutingPoolAccAddress) {
+      throw new Error("Arcium client not available");
+    }
+    return lib.getExecutingPoolAccAddress(clusterOffset);
+  });
 }
 
 /**
- * Get computation account address safely
+ * Safe wrapper for getFeePoolAccAddress
  */
-export function getComputationAccAddressSafe(programId, computationId) {
-  try {
-    const computationIdBuffer = Buffer.from(computationId);
-    return PublicKey.findProgramAddressSync(
-      [Buffer.from("computation"), computationIdBuffer],
-      programId
-    )[0];
-  } catch (error) {
-    console.error("Error getting computation account:", error);
-    return null;
-  }
+export function getFeePoolAccAddressSafe(clusterOffset) {
+  return getArciumLib().then((lib) => {
+    if (!lib || !lib.getFeePoolAccAddress) {
+      throw new Error("Arcium client not available");
+    }
+    return lib.getFeePoolAccAddress(clusterOffset);
+  });
 }
 
 /**
- * Await computation finalization safely
+ * Safe wrapper for getClockAccAddress
+ */
+export function getClockAccAddressSafe(clusterOffset) {
+  return getArciumLib().then((lib) => {
+    if (!lib || !lib.getClockAccAddress) {
+      throw new Error("Arcium client not available");
+    }
+    return lib.getClockAccAddress(clusterOffset);
+  });
+}
+
+/**
+ * Safe wrapper for getComputationAccAddress
+ */
+export function getComputationAccAddressSafe(clusterOffset, computationOffset) {
+  return getArciumLib().then((lib) => {
+    if (!lib || !lib.getComputationAccAddress) {
+      throw new Error("Arcium client not available");
+    }
+    
+    // Convert computationOffset to BN if needed
+    const offset = computationOffset instanceof Uint8Array 
+      ? computationOffset 
+      : Buffer.from(computationOffset.toString(16).padStart(16, "0"), "hex");
+    
+    return lib.getComputationAccAddress(clusterOffset, offset);
+  });
+}
+
+/**
+ * Safe wrapper for awaitComputationFinalization
  */
 export async function awaitComputationFinalizationSafe(
   connection,
-  computationAccount,
-  timeout = 60000
+  computationOffset,
+  programId,
+  commitment = "confirmed"
 ) {
-  // Placeholder implementation
-  // Actual implementation would poll the computation account
-  return new Promise((resolve, reject) => {
-    const startTime = Date.now();
-    
-    const checkStatus = async () => {
-      try {
-        // Poll computation account status
-        // This is a placeholder - actual implementation depends on Arcium SDK
-        const accountInfo = await connection.getAccountInfo(computationAccount);
-        
-        if (accountInfo) {
-          // Check if computation is finalized
-          // Placeholder logic
-          resolve({ finalized: true, accountInfo });
-        } else if (Date.now() - startTime > timeout) {
-          reject(new Error("Computation finalization timeout"));
-        } else {
-          setTimeout(checkStatus, 1000);
-        }
-      } catch (error) {
-        reject(error);
-      }
+  const lib = await getArciumLib();
+  if (!lib || !lib.awaitComputationFinalization) {
+    console.warn("Arcium client not available, skipping computation finalization wait");
+    return null;
+  }
+
+  try {
+    // Convert computationOffset to proper format
+    const offset = computationOffset instanceof Uint8Array 
+      ? computationOffset 
+      : Buffer.from(computationOffset.toString(16).padStart(16, "0"), "hex");
+
+    const provider = {
+      connection,
     };
 
-    checkStatus();
-  });
+    return await lib.awaitComputationFinalization(
+      provider,
+      offset,
+      programId,
+      commitment
+    );
+  } catch (error) {
+    console.error("Failed to await computation finalization:", error);
+    throw error;
+  }
 }
 

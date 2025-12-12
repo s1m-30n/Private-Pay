@@ -1,30 +1,17 @@
-/**
- * Arcium Constants
- * 
- * Program IDs and configuration constants for Arcium integration
- */
-
 import { PublicKey } from "@solana/web3.js";
 
-// Private Pay Program ID
-// Set via environment variable or use placeholder
+// Private Pay Program ID (from Anchor.toml)
+// Default: 3tFjfuwwpWkEJfo5JYTFyozc4rEa8ysksgWJUcUq3qTx (devnet)
 export const PRIVATE_PAY_PROGRAM_ID = new PublicKey(
-  import.meta.env.VITE_PRIVATE_PAY_PROGRAM_ID || 
-  "11111111111111111111111111111111"
+  import.meta.env.VITE_PRIVATE_PAY_PROGRAM_ID ||
+  "3tFjfuwwpWkEJfo5JYTFyozc4rEa8ysksgWJUcUq3qTx"
 );
 
 // Arcium Program ID
+// This is the standard Arcium program ID for devnet
+// Can be overridden via environment variable
 export const ARCIUM_PROGRAM_ID = new PublicKey(
-  import.meta.env.VITE_ARCIUM_PROGRAM_ID || 
-  "11111111111111111111111111111111"
-);
-
-// Arcium Environment (testnet/mainnet)
-export const ARCIUM_ENV = import.meta.env.VITE_ARCIUM_ENV || "testnet";
-
-// Arcium Cluster Offset
-export const ARCIUM_CLUSTER_OFFSET = parseInt(
-  import.meta.env.VITE_ARCIUM_CLUSTER_OFFSET || "0",
-  10
+  import.meta.env.VITE_ARCIUM_PROGRAM_ID ||
+  "Arcium1111111111111111111111111111111111111" // Placeholder - replace with actual Arcium program ID
 );
 

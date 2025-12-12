@@ -1,160 +1,136 @@
-/**
- * Arcium Integration Module
- * 
- * Provides Arcium MPC client and program access for private DeFi operations
- */
-
+import { useMemo, useState, useEffect } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { PublicKey } from "@solana/web3.js";
-import * as anchor from "@coral-xyz/anchor";
-import { useState, useEffect, useCallback } from "react";
+import { AnchorProvider } from "@coral-xyz/anchor";
+import { PRIVATE_PAY_PROGRAM_ID } from "./constants.js";
 
-// Program IDs (should be set from environment or constants)
-export const PRIVATE_PAY_PROGRAM_ID = new PublicKey(
-  process.env.VITE_PRIVATE_PAY_PROGRAM_ID || 
-  "11111111111111111111111111111111" // Placeholder
-);
-
-export const ARCIUM_PROGRAM_ID = new PublicKey(
-  process.env.VITE_ARCIUM_PROGRAM_ID || 
-  "11111111111111111111111111111111" // Placeholder
-);
+// Dynamic import for Anchor program type
+let PrivatePayProgram = null;
 
 /**
- * Arcium Client Hook
- * Provides access to Arcium MPC client
+ * Hook to get Arcium client with provider and accounts
  */
 export function useArciumClient() {
   const { connection } = useConnection();
-  const { publicKey, signTransaction } = useWallet();
-  const [client, setClient] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { publicKey, signTransaction, signAllTransactions } = useWallet();
+  const [mxeAccount, setMxeAccount] = useState(null);
+  const [clusterAccount, setClusterAccount] = useState(null);
+
+  const provider = useMemo(() => {
+    if (!connection || !publicKey || !signTransaction) return null;
+    
+    return new AnchorProvider(
+      connection,
+      {
+        publicKey,
+        signTransaction,
+        signAllTransactions,
+      },
+      { commitment: "confirmed" }
+    );
+  }, [connection, publicKey, signTransaction, signAllTransactions]);
 
   useEffect(() => {
-    let mounted = true;
+    if (!provider || !PRIVATE_PAY_PROGRAM_ID) return;
 
-    async function loadClient() {
-      if (!connection || !publicKey) {
-        setClient(null);
-        return;
-      }
-
-      setIsLoading(true);
-      setError(null);
-
+    // Initialize Arcium accounts
+    const initializeAccounts = async () => {
       try {
         // Dynamically import Arcium client
-        const arciumLib = await import("@arcium-hq/client");
-        
-        // Initialize Arcium client
-        // Note: Actual initialization depends on Arcium SDK API
-        const arciumClient = {
-          connection,
-          publicKey,
-          signTransaction,
-          // Add other Arcium-specific methods as needed
-        };
+        const arciumLib = await import("@arcium-hq/client").catch(() => null);
+        if (!arciumLib) {
+          console.warn("@arcium-hq/client not available");
+          return;
+        }
 
-        if (mounted) {
-          setClient(arciumClient);
+        // Get MXE account address
+        const mxeAddr = arciumLib.getMXEAccAddress(PRIVATE_PAY_PROGRAM_ID);
+        setMxeAccount(mxeAddr);
+
+        // Get cluster account (will be set when env is available)
+        const env = arciumLib.getArciumEnv?.();
+        if (env?.arciumClusterOffset) {
+          const clusterAddr = arciumLib.getClusterAccAddress?.(env.arciumClusterOffset);
+          if (clusterAddr) {
+            setClusterAccount(clusterAddr);
+          }
         }
-      } catch (err) {
-        console.warn("Arcium client not available:", err);
-        if (mounted) {
-          setError(err.message);
-          setClient(null);
-        }
-      } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
+      } catch (error) {
+        console.error("Failed to initialize Arcium accounts:", error);
       }
-    }
-
-    loadClient();
-
-    return () => {
-      mounted = false;
     };
-  }, [connection, publicKey, signTransaction]);
 
-  return { client, isLoading, error };
+    initializeAccounts();
+  }, [provider]);
+
+  return useMemo(() => {
+    if (!provider) return null;
+
+    return {
+      provider,
+      mxeAccount,
+      clusterAccount,
+      connection: provider.connection,
+    };
+  }, [provider, mxeAccount, clusterAccount]);
+}
+
+// Initialize program loader
+let programLoadPromise = null;
+
+/**
+ * Initialize the Private Pay program (call this once on app startup)
+ */
+export async function initializePrivatePayProgram() {
+  if (PrivatePayProgram) return PrivatePayProgram;
+  if (programLoadPromise) return programLoadPromise;
+
+  programLoadPromise = (async () => {
+    try {
+      // Dynamic import Anchor
+      const anchor = await import("@coral-xyz/anchor");
+      
+      // Try to load from Anchor workspace (if program has been built)
+      if (anchor.workspace?.PrivatePay) {
+        PrivatePayProgram = anchor.workspace.PrivatePay;
+        return PrivatePayProgram;
+      } else {
+        // Fallback: try to fetch IDL from on-chain or use a placeholder
+        console.warn("PrivatePay program types not found in workspace. You may need to build the Anchor program.");
+        // Return null to indicate program is not available
+        return null;
+      }
+    } catch (error) {
+      console.error("Failed to load PrivatePay program:", error);
+      return null;
+    }
+  })();
+
+  return programLoadPromise;
 }
 
 /**
- * Get Private Pay Program
- * Returns Anchor program instance for Private Pay
+ * Get Private Pay Anchor program instance
+ * Note: This function is synchronous but requires the program to be initialized first.
+ * Call initializePrivatePayProgram() on app startup.
  */
-export function getPrivatePayProgram(connection, wallet) {
-  if (!connection || !wallet) {
-    throw new Error("Connection and wallet are required");
+export function getPrivatePayProgram(provider) {
+  if (!provider) {
+    throw new Error("Provider is required");
   }
 
-  // Create Anchor provider
-  const provider = new anchor.AnchorProvider(
-    connection,
-    wallet,
-    anchor.AnchorProvider.defaultOptions()
-  );
+  if (!PRIVATE_PAY_PROGRAM_ID) {
+    throw new Error("PRIVATE_PAY_PROGRAM_ID is not configured");
+  }
 
-  // Load program IDL
-  // Note: In production, load from actual IDL file
-  const programId = PRIVATE_PAY_PROGRAM_ID;
+  if (!PrivatePayProgram) {
+    // Program not initialized yet - return null and let the caller handle it
+    console.warn("PrivatePay program not initialized. Call initializePrivatePayProgram() first.");
+    return null;
+  }
 
   // Return program instance
-  // Note: This is a placeholder - actual implementation depends on IDL
-  return {
-    programId,
-    provider,
-    // Add program methods as needed
-  };
-}
-
-/**
- * Get Arcium Program
- * Returns Arcium program instance
- */
-export function getArciumProgram(connection, wallet) {
-  if (!connection || !wallet) {
-    throw new Error("Connection and wallet are required");
-  }
-
-  const provider = new anchor.AnchorProvider(
-    connection,
-    wallet,
-    anchor.AnchorProvider.defaultOptions()
-  );
-
-  const programId = ARCIUM_PROGRAM_ID;
-
-  return {
-    programId,
-    provider,
-  };
-}
-
-/**
- * Initialize Arcium for a program
- * Sets up Arcium MPC connection
- */
-export async function initializeArciumForProgram(programId, connection) {
-  try {
-    // Dynamically import Arcium client
-    const arciumLib = await import("@arcium-hq/client");
-    
-    // Initialize Arcium connection
-    // This is a placeholder - actual implementation depends on Arcium SDK
-    console.log("Initializing Arcium for program:", programId.toString());
-    
-    return {
-      programId,
-      connection,
-      initialized: true,
-    };
-  } catch (error) {
-    console.error("Failed to initialize Arcium:", error);
-    throw error;
-  }
+  // Note: The program from workspace should already be configured with a provider
+  // If you need a new instance with a different provider, you may need to recreate it
+  return PrivatePayProgram;
 }
 
