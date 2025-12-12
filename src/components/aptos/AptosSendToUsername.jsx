@@ -34,36 +34,46 @@ export default function AptosSendToUsername() {
 
     setIsLoading(true);
     try {
-      // Check if it's a username or alias
-      let recipientUsername = username;
-      
-      // First try to find as username
-      let recipient = await getUserByUsername(username);
-      
-      // If not found, try to find as payment link alias
-      if (!recipient) {
-        const { getPaymentLinkByAlias } = await import("../../lib/supabase");
-        const paymentLink = await getPaymentLinkByAlias(username);
+      // Add timeout to prevent hanging
+      const sendPromise = (async () => {
+        // Check if it's a username or alias
+        let recipientUsername = username;
         
-        if (paymentLink) {
-          recipientUsername = paymentLink.username;
-          recipient = await getUserByUsername(recipientUsername);
+        // First try to find as username
+        let recipient = await getUserByUsername(username);
+        
+        // If not found, try to find as payment link alias
+        if (!recipient) {
+          const { getPaymentLinkByAlias } = await import("../../lib/supabase");
+          const paymentLink = await getPaymentLinkByAlias(username);
+          
+          if (paymentLink) {
+            recipientUsername = paymentLink.username;
+            recipient = await getUserByUsername(recipientUsername);
+          }
         }
-      }
-      
-      if (!recipient) {
-        toast.error(`Username or payment link ${username} not found`);
-        setIsLoading(false);
-        return;
-      }
+        
+        if (!recipient) {
+          throw new Error(`Username or payment link ${username} not found`);
+        }
 
-      // Send APT to treasury wallet
-      const result = await sendAptTransfer({
-        accountAddress: account,
-        recipientAddress: TREASURY_WALLET,
-        amount: parseFloat(amount),
-        isTestnet: true,
+        // Send APT to treasury wallet
+        const result = await sendAptTransfer({
+          accountAddress: account,
+          recipientAddress: TREASURY_WALLET,
+          amount: parseFloat(amount),
+          isTestnet: true,
+        });
+        
+        return { result, recipientUsername };
+      })();
+      
+      // Add 60 second timeout
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Transaction timeout. Please try again.")), 60000);
       });
+      
+      const { result, recipientUsername } = await Promise.race([sendPromise, timeoutPromise]);
 
       if (!result.success) {
         throw new Error("Transaction failed");

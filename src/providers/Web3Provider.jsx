@@ -53,12 +53,42 @@ export default function Web3Provider({ children }) {
 
   async function init() {
     if (isInitiating.current || !primaryWallet) return;
+    
+    // Check if contract address is configured
+    if (!CONTRACT_ADDRESS) {
+      console.warn("Contract address not configured. Set VITE_SQUIDL_STEALTHSIGNER_CONTRACT_ADDRESS environment variable.");
+      setLoaded(false);
+      return;
+    }
+    
     isInitiating.current = true;
     try {
       const _provider = await getWeb3Provider(primaryWallet);
       const _signer = await getSigner(primaryWallet);
+      
+      // Ensure provider has network/chainId before wrapping
+      // This prevents Dynamic SDK errors when trying to access chainId
+      try {
+        const network = await _provider.getNetwork();
+        if (!network || network.chainId === undefined || network.chainId === null) {
+          console.warn("Provider network not available yet, waiting...");
+          // Wait a bit and retry
+          await sleep(1000);
+          const retryNetwork = await _provider.getNetwork();
+          if (!retryNetwork || retryNetwork.chainId === undefined || retryNetwork.chainId === null) {
+            throw new Error("Provider chainId is not available");
+          }
+        }
+        console.log("[Web3Provider] Provider initialized with chainId:", network.chainId);
+      } catch (networkError) {
+        console.error("Error getting network from provider:", networkError);
+        throw new Error("Provider network not available. Please ensure your wallet is connected.");
+      }
+      
       const wrappedProvider = wrapEthersProvider(_provider);
       const wrappedSigner = wrapEthersSigner(_signer);
+      
+      // Create contract with validated address
       const contract = new ethers.Contract(
         CONTRACT_ADDRESS,
         ContractABI.abi,
@@ -102,17 +132,15 @@ export default function Web3Provider({ children }) {
             toast.error(
               `Failed to switch network. Please switch to ${oasis.name} manually.`
             );
-            await sleep(2000);
-
-            handleLogOut();
+            // Don't logout immediately - let user try to switch manually
+            // Only logout if user explicitly cancels or closes wallet
             return;
           }
         } else {
           toast.error(
             `Network switching not supported. Please switch to ${oasis.name} manually.`
           );
-          await sleep(2000);
-          handleLogOut();
+          // Don't logout - let user switch network manually
           return;
         }
       } else {
@@ -123,8 +151,7 @@ export default function Web3Provider({ children }) {
     } catch (error) {
       console.error("Error checking network:", error);
       toast.error(`Error connecting to the network. Please switch manually.`);
-      await sleep(2000);
-      handleLogOut();
+      // Don't logout on network errors - might be temporary
       return;
     } finally {
       setIsNetworkChecking(false);
@@ -148,8 +175,15 @@ export default function Web3Provider({ children }) {
   }
 
   useEffect(() => {
-    if (primaryWallet) {
+    // Only initialize if we have a primary wallet
+    if (primaryWallet && primaryWallet.address) {
       switchNetworkIfNeeded(false);
+    } else {
+      // Reset state if no wallet
+      setProvider(null);
+      setSigner(null);
+      setContract(null);
+      setLoaded(false);
     }
   }, [primaryWallet]);
 

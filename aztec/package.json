@@ -1,0 +1,22 @@
+{
+  "name": "aztec-contracts",
+  "version": "1.0.0",
+  "description": "Aztec Noir contracts for Zcash-Aztec bridge and stablecoin",
+  "type": "module",
+  "scripts": {
+    "build": "aztec build",
+    "test": "aztec test",
+    "deploy:testnet": "node scripts/deploy.js testnet",
+    "deploy:mainnet": "node scripts/deploy.js mainnet",
+    "compile": "aztec compile",
+    "format": "aztec format"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "@aztec/cli": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}
+

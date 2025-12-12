@@ -68,55 +68,9 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         plugins: [],
         output: {
-          manualChunks(id) {
-            // Don't split node polyfills - keep them together
-            if (id.includes('node_modules')) {
-              // Keep polyfills together - CRITICAL for Buffer initialization
-              if (id.includes('buffer') || id.includes('node-polyfills') || id.includes('readable-stream') || id.includes('stream-browserify')) {
-                return 'polyfills';
-              }
-              // React and core
-              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-                return 'react-vendor';
-              }
-              // UI libraries
-              if (id.includes('@nextui-org') || id.includes('framer-motion') || id.includes('lucide-react')) {
-                return 'ui-vendor';
-              }
-              // Wallet adapters
-              if (id.includes('@dynamic-labs') || id.includes('@solana/wallet-adapter')) {
-                return 'wallet-vendor';
-              }
-              // Ethers
-              if (id.includes('ethers') || id.includes('@oasisprotocol/sapphire-ethers')) {
-                return 'ethers-vendor';
-              }
-              // Blockchain SDKs - split to avoid Buffer issues
-              if (id.includes('@aptos-labs')) {
-                return 'aptos-vendor';
-              }
-              if (id.includes('@solana/web3.js')) {
-                return 'solana-vendor';
-              }
-              if (id.includes('@coral-xyz/anchor')) {
-                return 'anchor-vendor';
-              }
-              // Arcium
-              if (id.includes('@arcium-hq')) {
-                return 'arcium-vendor';
-              }
-              // Crypto
-              if (id.includes('@noble') || id.includes('bs58') || id.includes('bn.js')) {
-                return 'crypto-vendor';
-              }
-              // Utils
-              if (id.includes('axios') || id.includes('@supabase') || id.includes('swr') || id.includes('date-fns') || id.includes('dayjs')) {
-                return 'utils-vendor';
-              }
-              // Default vendor chunk
-              return 'vendor';
-            }
-          },
+          // Let Vite handle chunking automatically to avoid circular dependencies
+          // and execution order issues (like "id is not a function").
+          manualChunks: undefined,
         },
       },
     },
