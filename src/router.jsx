@@ -16,6 +16,10 @@ import ArciumDashboard from "./pages/ArciumDashboard.jsx";
 import PrivateSwapPage from "./pages/PrivateSwapPage.jsx";
 import DarkPoolPage from "./pages/DarkPoolPage.jsx";
 import PrivatePaymentsPage from "./pages/PrivatePaymentsPage.jsx";
+import MinaPage from "./pages/MinaPage.jsx";
+import ZcashPage from "./pages/ZcashPage.jsx";
+import BridgePage from "./pages/BridgePage.jsx";
+import ZcashMinaBridgePage from "./pages/ZcashMinaBridgePage.jsx";
 
 const EXCLUDED_SUBDOMAINS = [
   "www",
@@ -118,6 +122,22 @@ export const router = createBrowserRouter([
       {
         path: "/arcium/payments",
         element: <PrivatePaymentsPage />,
+      },
+      {
+        path: "/mina",
+        element: <MinaPage />,
+      },
+      {
+        path: "/zcash",
+        element: <ZcashPage />,
+      },
+      {
+        path: "/bridge",
+        element: <BridgePage />,
+      },
+      {
+        path: "/zcash-mina-bridge",
+        element: <ZcashMinaBridgePage />,
       },
     ],
   },
