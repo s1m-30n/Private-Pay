@@ -4,7 +4,7 @@ import AuthProvider from "./AuthProvider.jsx";
 import Web3Provider from "./Web3Provider.jsx";
 import AptosProvider from "./AptosProvider.jsx";
 import SolanaProvider from "./SolanaProvider.jsx";
-import MinaProvider from "./MinaProvider.jsx";
+import MinaProvider from "../components/mina-protocol/MinaProvider";
 import ZcashProvider from "./ZcashProvider.jsx";
 import { SWRConfig } from "swr";
 import UserProvider from "./UserProvider.jsx";

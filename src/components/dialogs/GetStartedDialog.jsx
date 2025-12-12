@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { squidlAPI } from "../../api/squidl";
 import { useUserWallets } from "@dynamic-labs/sdk-react-core";
 import Nounsies from "../shared/Nounsies";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { useNavigate } from "react-router-dom";
 import { useWeb3 } from "../../providers/Web3Provider";
 import { useDebounce } from "@uidotdev/usehooks";
@@ -81,15 +81,20 @@ function StepOne({ setStep }) {
 
       setIsUsernameAvailable(data)
     } catch (error) {
-      console.error('Error checking username', error)
+      // If backend is not available, allow username (skip validation)
+      if (error.code === 'ERR_NETWORK' || error.message?.includes('CONNECTION_REFUSED')) {
+        // Backend unavailable - allow username to proceed
+        setIsUsernameAvailable(true);
+      } else {
+        // Other errors - don't allow username
+        setIsUsernameAvailable(false);
+      }
     } finally {
       setIsCheckingUsername(false);
     }
   };
 
   useEffect(() => {
-    console.log('debouncedUsername', debouncedUsername)
-
     if (!debouncedUsername) {
       setIsUsernameAvailable(false);
       setIsCheckingUsername(false);
@@ -97,7 +102,6 @@ function StepOne({ setStep }) {
     } else {
       handleCheckUsername()
     }
-
   }, [debouncedUsername])
 
   const [loading, setLoading] = useState(false);
@@ -145,7 +149,27 @@ function StepOne({ setStep }) {
       // Sapphire Provider and Paymaster Wallet
       const sapphireProvider = new ethers.JsonRpcProvider(sapphireTestnet.rpcUrls[0]);
       const paymasterPK = import.meta.env.VITE_PAYMASTER_PK;
-      const paymasterWallet = new ethers.Wallet(paymasterPK, sapphireProvider);
+      
+      // Validate paymaster private key
+      if (!paymasterPK || paymasterPK === "[REDACTED]" || paymasterPK.trim() === "" || paymasterPK.includes("REDACTED")) {
+        toast.error("Paymaster private key not configured. Please set VITE_PAYMASTER_PK environment variable.");
+        throw new Error("Paymaster private key not configured. Please set VITE_PAYMASTER_PK environment variable.");
+      }
+      
+      let paymasterWallet;
+      try {
+        paymasterWallet = new ethers.Wallet(paymasterPK, sapphireProvider);
+        // Validate the wallet was created successfully
+        if (!paymasterWallet.address) {
+          throw new Error("Failed to create wallet from private key");
+        }
+      } catch (keyError) {
+        const errorMessage = keyError.message?.includes("invalid private key") 
+          ? "Invalid paymaster private key format. Please check VITE_PAYMASTER_PK environment variable."
+          : `Failed to create paymaster wallet: ${keyError.message}`;
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
+      }
 
       const contract = new ethers.Contract(
         sapphireTestnet.stealthSignerContract.address,
@@ -177,12 +201,27 @@ function StepOne({ setStep }) {
 
       console.log("Meta Address Info:", metaAddressInfo);
 
-      await squidlAPI.post("/user/update-user", {
-        username: username.toLowerCase(),
-        metaAddressInfo: metaAddressInfo
-      });
+      try {
+        await squidlAPI.post("/user/update-user", {
+          username: username.toLowerCase(),
+          metaAddressInfo: metaAddressInfo
+        });
 
-      toast.success("Meta address and ENS username successfully created");
+        // Invalidate SWR cache to refresh user data
+        await mutate("/auth/me");
+
+        toast.success("Meta address and ENS username successfully created");
+      } catch (error) {
+        // If backend is not available, still allow local flow
+        if (error.code === 'ERR_NETWORK' || error.message?.includes('CONNECTION_REFUSED')) {
+          console.warn("[GetStartedDialog] Backend not available, skipping user update");
+          toast.success("Meta address created (local mode - backend unavailable)");
+          // Still invalidate cache to update local state
+          await mutate("/auth/me");
+        } else {
+          throw error;
+        }
+      }
 
       setStep("two");
     } catch (e) {
@@ -252,8 +291,27 @@ function StepTwo({ setOpen }) {
   const [confettiTrigger, setConfettiTrigger] = useState(false);
   const userWallets = useUserWallets();
   const { data: user, isLoading } = useSWR("/auth/me", async (url) => {
-    const { data } = await squidlAPI.get(url);
-    return data;
+    try {
+      const { data } = await squidlAPI.get(url);
+      return data;
+    } catch (error) {
+      // If backend is not available, return fallback user data
+      if (error.code === 'ERR_NETWORK' || error.message?.includes('CONNECTION_REFUSED')) {
+        console.warn("[GetStartedDialog] Backend not available, using fallback user data");
+        return {
+          user: {
+            address: userWallets?.[0]?.address,
+            username: null,
+          },
+        };
+      }
+      throw error;
+    }
+  }, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    shouldRetryOnError: false,
+    errorRetryCount: 0,
   });
 
   const navigate = useNavigate();
@@ -306,7 +364,9 @@ function StepTwo({ setOpen }) {
         Start Sharing
       </Button>
       <Button
-        onClick={() => {
+        onClick={async () => {
+          // Refresh user data before closing
+          await mutate("/auth/me");
           setOpen(false);
           navigate("/");
         }}

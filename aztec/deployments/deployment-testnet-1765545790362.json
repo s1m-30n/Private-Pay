@@ -1,0 +1,34 @@
+{
+  "network": "testnet",
+  "timestamp": "2025-12-12T13:23:10.362Z",
+  "contracts": [
+    {
+      "name": "DummyZEC",
+      "config": {
+        "contract": "DummyZEC",
+        "network": "testnet",
+        "timestamp": "2025-12-12T13:23:10.353Z",
+        "minter": "TBD"
+      }
+    },
+    {
+      "name": "ZcashBridge",
+      "config": {
+        "contract": "ZcashBridge",
+        "network": "testnet",
+        "timestamp": "2025-12-12T13:23:10.357Z",
+        "operator": "TBD"
+      }
+    },
+    {
+      "name": "PZUSD",
+      "config": {
+        "contract": "PZUSD",
+        "network": "testnet",
+        "timestamp": "2025-12-12T13:23:10.359Z",
+        "oracle": "TBD",
+        "zecAssetId": "TBD"
+      }
+    }
+  ]
+}

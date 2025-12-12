@@ -4,7 +4,7 @@ import {
     connectMinaWallet,
     getMinaBalance,
     requestNetwork
-} from "../lib/mina";
+} from "./mina";
 import toast from "react-hot-toast";
 
 const MinaContext = createContext({});
