@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
+import ErrorBoundary from "./ErrorBoundary.jsx";
 import "./index.css";
 
 // Polyfill for require in browser (for CommonJS modules)
@@ -93,8 +94,30 @@ try {
   console.error('[Init] Error cleaning localStorage:', error);
 }
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  console.error("Root element not found!");
+  document.body.innerHTML = '<div style="padding: 20px; text-align: center;"><h1>Error: Root element not found</h1><p>Please check the HTML structure.</p></div>';
+} else {
+  try {
+    createRoot(rootElement).render(
+      <StrictMode>
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
+      </StrictMode>
+    );
+    console.log("App rendered successfully");
+  } catch (error) {
+    console.error("Failed to render app:", error);
+    rootElement.innerHTML = `
+      <div style="padding: 20px; text-align: center;">
+        <h1>Failed to Load App</h1>
+        <p style="color: #666;">${error.message}</p>
+        <button onclick="window.location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #0070f3; color: white; border: none; border-radius: 5px; cursor: pointer;">
+          Reload Page
+        </button>
+      </div>
+    `;
+  }
+}
