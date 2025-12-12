@@ -15,10 +15,16 @@ if (typeof window !== "undefined" && typeof window.require === "undefined") {
 window.addEventListener('unhandledrejection', (event) => {
   // Ignore WalletConnect connection errors (non-critical)
   const reason = event.reason?.message || String(event.reason || '');
+  const reasonStr = typeof event.reason === 'object' ? JSON.stringify(event.reason) : String(event.reason || '');
+  
   if (reason.includes('Socket stalled') || 
       reason.includes('WalletConnect') ||
-      reason.includes('relay.walletconnect')) {
+      reason.includes('relay.walletconnect') ||
+      reasonStr.includes('Socket stalled') ||
+      reasonStr.includes('WalletConnect') ||
+      reasonStr.includes('relay.walletconnect')) {
     // Suppress these warnings - they're non-critical
+    // WalletConnect will fall back to other connection methods
     event.preventDefault();
     return;
   }
@@ -34,6 +40,17 @@ window.addEventListener('unhandledrejection', (event) => {
 
 // Global error handler for uncaught errors
 window.addEventListener('error', (event) => {
+  // Suppress WalletConnect WebSocket errors (non-critical)
+  const errorMessage = event.error?.message || event.message || '';
+  if (errorMessage.includes('Socket stalled') || 
+      errorMessage.includes('WalletConnect') ||
+      errorMessage.includes('relay.walletconnect') ||
+      errorMessage.includes('WebSocket connection')) {
+    // Suppress these - they're non-critical connection attempts
+    event.preventDefault();
+    return;
+  }
+  
   console.error('[Global] Uncaught error:', event.error);
   
   // Check if it's a JSON parse error
