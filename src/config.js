@@ -1,7 +1,10 @@
 import StealthSignerABI from "./abi/StealthSigner.json";
 
-// export const CONTRACT_ADDRESS = "0x6b84f47Ef5c73AA8A9bc0D7Ff18ba3487aA5C1D3";
-export const CONTRACT_ADDRESS = import.meta.env.VITE_SQUIDL_STEALTHSIGNER_CONTRACT_ADDRESS;
+// Fallback contract address (can be overridden by environment variable)
+const DEFAULT_CONTRACT_ADDRESS = "0x6b84f47Ef5c73AA8A9bc0D7Ff18ba3487aA5C1D3";
+export const CONTRACT_ADDRESS = 
+  import.meta.env.VITE_SQUIDL_STEALTHSIGNER_CONTRACT_ADDRESS || 
+  DEFAULT_CONTRACT_ADDRESS;
 
 export const sapphireTestnet = {
   chainId: 0x5aff,
@@ -14,7 +17,7 @@ export const sapphireTestnet = {
   },
   blockExplorerUrls: ["https://testnet.explorer.sapphire.oasis.io"], // Explorer for the Testnet
   stealthSignerContract: {
-    address: import.meta.env.VITE_SQUIDL_STEALTHSIGNER_CONTRACT_ADDRESS,
+    address: import.meta.env.VITE_SQUIDL_STEALTHSIGNER_CONTRACT_ADDRESS || DEFAULT_CONTRACT_ADDRESS,
     abi: StealthSignerABI,
   },
 };

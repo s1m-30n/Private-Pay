@@ -24,6 +24,7 @@ export default defineConfig(({ mode }) => {
         };
 
   return {
+    base: '/', // Explicit base path for Vercel
     plugins: [
       react(),
       svgr(),
@@ -66,6 +67,11 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         plugins: [],
+        output: {
+          // Let Vite handle chunking automatically to avoid circular dependencies
+          // and execution order issues (like "id is not a function").
+          manualChunks: undefined,
+        },
       },
     },
   };
