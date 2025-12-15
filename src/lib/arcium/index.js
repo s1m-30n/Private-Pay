@@ -133,4 +133,3 @@ export function getPrivatePayProgram(provider) {
   // If you need a new instance with a different provider, you may need to recreate it
   return PrivatePayProgram;
 }
-

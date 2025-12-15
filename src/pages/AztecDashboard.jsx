@@ -2,15 +2,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, CardBody, Chip } from "@nextui-org/react";
 import { Icons } from "../components/shared/Icons";
-import { 
-  Lock, 
-  ArrowLeftRight, 
+import {
+  Lock,
+  ArrowLeftRight,
   Coins,
   Shield,
   Zap,
   Eye,
   EyeOff
 } from "lucide-react";
+
+import PrivacyNavbar from "../components/shared/PrivacyNavbar.jsx";
 
 export default function AztecDashboard() {
   const navigate = useNavigate();
@@ -41,6 +43,9 @@ export default function AztecDashboard() {
   return (
     <div className="flex min-h-screen w-full items-start justify-center py-20 px-4 md:px-10 bg-gradient-to-br from-white to-indigo-50/30">
       <div className="w-full max-w-6xl">
+        <div className="mb-8 flex justify-center">
+          <PrivacyNavbar />
+        </div>
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">

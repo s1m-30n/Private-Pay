@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { DollarSign, LayoutDashboard, Wallet, Shield, Lock } from "lucide-react";
+import { DollarSign, LayoutDashboard, Wallet, Shield, Lock, ArrowLeftRight } from "lucide-react";
 import { cnm } from "../../utils/style.js";
 
 export default function Navbar() {
@@ -29,7 +29,7 @@ export default function Navbar() {
           <Wallet className="size-3" />
           Payment Links
         </Link>
-        
+
         <Link
           to={"/transactions"}
           className={cnm(
@@ -40,7 +40,7 @@ export default function Navbar() {
           <DollarSign className="size-3" />
           Transactions
         </Link>
-        
+
         <Link
           to={"/arcium"}
           className={cnm(
@@ -51,7 +51,7 @@ export default function Navbar() {
           <Shield className="size-3" />
           Arcium
         </Link>
-        
+
         <Link
           to={"/aztec"}
           className={cnm(
@@ -61,6 +61,66 @@ export default function Navbar() {
         >
           <Lock className="size-3" />
           Aztec
+        </Link>
+        <Link
+          to={"/mina"}
+          className={cnm(
+            "px-3 py-2 rounded-full flex items-center gap-1 transition-all duration-300",
+            `${location.pathname.startsWith("/mina") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <Shield className="size-3" />
+          Mina
+        </Link>
+        <Link
+          to={"/bridge"}
+          className={cnm(
+            "px-3 py-2 rounded-full flex items-center gap-1 transition-all duration-300",
+            `${location.pathname.startsWith("/bridge") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <Shield className="size-3" />
+          Bridge
+        </Link>
+        <Link
+          to={"/zcash"}
+          className={cnm(
+            "px-3 py-2 rounded-full flex items-center gap-1 transition-all duration-300",
+            `${location.pathname.startsWith("/zcash") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <Shield className="size-3" />
+          Zcash
+        </Link>
+        <Link to={"/zcash-mina-bridge"}
+          className={cnm(
+            "px-3 py-2 rounded-full flex items-center gap-1 transition-all duration-300",
+            `${location.pathname.startsWith("/zcash-mina-bridge") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <Shield className="size-3" />
+          Zcash-Mina Bridge
+        </Link>
+        <Link
+          to={"/stablecoin"}
+          className={cnm(
+            "px-3 py-2 rounded-full flex items-center gap-1 transition-all duration-300",
+            `${location.pathname.startsWith("/stablecoin") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <Shield className="size-3" />
+          Stablecoin
+        </Link>
+
+        <Link
+          to={"/cross-chain"}
+          className={cnm(
+            "px-3 py-2 rounded-full flex items-center gap-1 transition-all duration-300",
+            `${location.pathname === "/cross-chain" ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <ArrowLeftRight className="size-3" />
+          Axelar
         </Link>
       </div>
     </div>

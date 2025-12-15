@@ -22,6 +22,11 @@ const PrivatePaymentsPage = lazy(() => import("./pages/PrivatePaymentsPage.jsx")
 // Zcash-Aztec Integration Pages
 const BridgePage = lazy(() => import("./pages/BridgePage.jsx"));
 const StablecoinPage = lazy(() => import("./pages/StablecoinPage.jsx"));
+const MinaPage = lazy(() => import("./components/mina-protocol/MinaPage.jsx"));
+const ZcashPage = lazy(() => import("./pages/ZcashPage.jsx"));
+const ZcashMinaBridgePage = lazy(() => import("./pages/ZcashMinaBridgePage.jsx"));
+// Axelar Cross-Chain Payments
+const CrossChainPaymentPage = lazy(() => import("./pages/CrossChainPaymentPage.jsx"));
 
 // Loading component
 const PageLoader = () => (
@@ -152,6 +157,23 @@ export const router = createBrowserRouter([
       {
         path: "/stablecoin",
         element: <LazyRoute Component={StablecoinPage} />,
+      },
+      {
+        path: "/mina",
+        element: <LazyRoute Component={MinaPage} />,
+      },
+      {
+        path: "/zcash",
+        element: <LazyRoute Component={ZcashPage} />,
+      },
+      {
+        path: "/zcash-mina-bridge",
+        element: <LazyRoute Component={ZcashMinaBridgePage} />,
+      },
+      // Axelar Cross-Chain Payment
+      {
+        path: "/cross-chain",
+        element: <LazyRoute Component={CrossChainPaymentPage} />,
       },
     ],
   },
