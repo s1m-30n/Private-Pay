@@ -4,19 +4,13 @@ import RootProvider from "./providers/RootProvider";
 import { RootLayout } from "./layouts/RootLayout.jsx";
 
 function App() {
-  console.log("[App] Rendering App component...");
-  try {
-    return (
-      <RootLayout>
-        <RootProvider>
-          <RouterProvider router={router} />
-        </RootProvider>
-      </RootLayout>
-    );
-  } catch (error) {
-    console.error("[App] Error in App component:", error);
-    throw error;
-  }
+  return (
+    <RootLayout>
+      <RootProvider>
+        <RouterProvider router={router} />
+      </RootProvider>
+    </RootLayout>
+  );
 }
 
 export default App;

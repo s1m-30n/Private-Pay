@@ -27,11 +27,7 @@ export default [
     files: ["src/**/*.{js,jsx}"],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: {
-        ...globals.browser,
-        Buffer: "readonly",
-        process: "readonly",
-      },
+      globals: globals.browser,
       parserOptions: {
         ecmaVersion: "latest",
         ecmaFeatures: { jsx: true },

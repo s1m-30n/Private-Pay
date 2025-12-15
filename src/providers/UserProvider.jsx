@@ -34,60 +34,42 @@ export default function UserProvider({ children }) {
   const address = primaryWallet?.address;
 
   const handleFetchAssets = async () => {
-    if (isAssetsLoading || !userData?.user?.username) {
-      // Skip if no username (backend might be down or user not set up)
-      console.warn("[UserProvider] Skipping asset fetch - no username available");
-      return;
-    }
+    if (isAssetsLoading) return;
     setAssetsLoading(true);
     try {
-      console.log(`Fetching assets for ${userData.user.username}.squidl.eth`, {
+      console.log(`Fetching assets for ${userData.username}.squidl.eth`, {
         userData,
       });
 
       const res = await squidlAPI.get(
-        `/user/wallet-assets/${userData.user.username}/all-assets`
+        `/user/wallet-assets/${userData.username}/all-assets`
       );
 
       setAssets(res.data);
     } catch (error) {
-      // If backend is not available, don't show error toast
-      if (error.code === 'ERR_NETWORK' || error.message?.includes('CONNECTION_REFUSED')) {
-        console.warn("[UserProvider] Backend not available, skipping asset fetch");
-      } else {
-        console.error("Error fetching user assets", error);
-        toast.error("Error fetching user assets");
-      }
+      console.error("Error fetching user assets", error);
+      toast.error("Error fetching user assets");
     } finally {
       setAssetsLoading(false);
     }
   };
 
   const refetchAssets = async () => {
-    if (isAssetsRefetching || !userData?.user?.username) {
-      // Skip if no username (backend might be down or user not set up)
-      console.warn("[UserProvider] Skipping asset refetch - no username available");
-      return;
-    }
+    if (isAssetsRefetching) return;
     setAssetsRefetching(true);
     try {
-      console.log(`Fetching assets for ${userData.user.username}.squidl.eth`, {
+      console.log(`Fetching assets for ${userData.username}.squidl.eth`, {
         userData,
       });
 
       const res = await squidlAPI.get(
-        `/user/wallet-assets/${userData.user.username}/all-assets`
+        `/user/wallet-assets/${userData.username}/all-assets`
       );
 
       setAssets(res.data);
     } catch (error) {
-      // If backend is not available, don't show error toast
-      if (error.code === 'ERR_NETWORK' || error.message?.includes('CONNECTION_REFUSED')) {
-        console.warn("[UserProvider] Backend not available, skipping asset refetch");
-      } else {
-        console.error("Error fetching user assets", error);
-        toast.error("Error fetching user assets");
-      }
+      console.error("Error fetching user assets", error);
+      toast.error("Error fetching user assets");
     } finally {
       setAssetsRefetching(false);
     }

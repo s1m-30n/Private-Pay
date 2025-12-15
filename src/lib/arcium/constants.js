@@ -14,4 +14,3 @@ export const ARCIUM_PROGRAM_ID = new PublicKey(
   import.meta.env.VITE_ARCIUM_PROGRAM_ID ||
   "Arcium1111111111111111111111111111111111111" // Placeholder - replace with actual Arcium program ID
 );
-

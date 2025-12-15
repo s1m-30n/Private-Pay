@@ -6,19 +6,12 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/((?!assets/).*)",
-      "destination": "/index.html"
-    }
-  ],
-  "headers": [
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
     {
-      "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

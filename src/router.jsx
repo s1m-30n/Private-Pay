@@ -1,46 +1,21 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { createBrowserRouter } from "react-router-dom";
+import IndexPage from "./pages/IndexPage.jsx";
 import AuthLayout from "./layouts/AuthLayout.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import PlainLayout from "./layouts/PlainLayout.jsx";
-
-// Lazy load pages for code-splitting
-const IndexPage = lazy(() => import("./pages/IndexPage.jsx"));
-const PaymentPage = lazy(() => import("./pages/PaymentPage.jsx"));
-const AliasDetailPage = lazy(() => import("./pages/AliasDetailPage.jsx").then(m => ({ default: m.AliasDetailPage })));
-const TransferPage = lazy(() => import("./pages/TransferPage.jsx"));
-const PaymentLinksPage = lazy(() => import("./pages/PaymentLinksPage.jsx"));
-const TransactionsPage = lazy(() => import("./pages/TransactionsPage.jsx"));
-const MainBalancePage = lazy(() => import("./pages/MainBalancePage.jsx"));
-const PrivateBalancePage = lazy(() => import("./pages/PrivateBalancePage.jsx"));
-const SendPage = lazy(() => import("./pages/SendPage.jsx"));
+import PaymentPage from "./pages/PaymentPage.jsx";
+import { AliasDetailPage } from "./pages/AliasDetailPage.jsx";
+import TransferPage from "./pages/TransferPage.jsx";
+import PaymentLinksPage from "./pages/PaymentLinksPage.jsx";
+import TransactionsPage from "./pages/TransactionsPage.jsx";
+import MainBalancePage from "./pages/MainBalancePage.jsx";
+import PrivateBalancePage from "./pages/PrivateBalancePage.jsx";
+import SendPage from "./pages/SendPage.jsx";
 // Arcium Private DeFi Pages
-const ArciumDashboard = lazy(() => import("./pages/ArciumDashboard.jsx"));
-const PrivateSwapPage = lazy(() => import("./pages/PrivateSwapPage.jsx"));
-const DarkPoolPage = lazy(() => import("./pages/DarkPoolPage.jsx"));
-const PrivatePaymentsPage = lazy(() => import("./pages/PrivatePaymentsPage.jsx"));
-// Zcash-Aztec Integration Pages
-const BridgePage = lazy(() => import("./pages/BridgePage.jsx"));
-const StablecoinPage = lazy(() => import("./pages/StablecoinPage.jsx"));
-const MinaPage = lazy(() => import("./components/mina-protocol/MinaPage.jsx"));
-const ZcashPage = lazy(() => import("./pages/ZcashPage.jsx"));
-const ZcashMinaBridgePage = lazy(() => import("./pages/ZcashMinaBridgePage.jsx"));
-// Axelar Cross-Chain Payments
-const CrossChainPaymentPage = lazy(() => import("./pages/CrossChainPaymentPage.jsx"));
-
-// Loading component
-const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-  </div>
-);
-
-// Wrapper component for lazy-loaded routes
-const LazyRoute = ({ Component }) => (
-  <Suspense fallback={<PageLoader />}>
-    <Component />
-  </Suspense>
-);
+import ArciumDashboard from "./pages/ArciumDashboard.jsx";
+import PrivateSwapPage from "./pages/PrivateSwapPage.jsx";
+import DarkPoolPage from "./pages/DarkPoolPage.jsx";
+import PrivatePaymentsPage from "./pages/PrivatePaymentsPage.jsx";
 
 const EXCLUDED_SUBDOMAINS = [
   "www",
@@ -66,8 +41,7 @@ export const router = createBrowserRouter([
     element: <AuthLayout />,
     loader: () => {
       const host = window.location.hostname;
-      const websiteHost = import.meta.env.VITE_WEBSITE_HOST || 'privatepay.me';
-      const suffix = `.${websiteHost}`;
+      const suffix = `.${import.meta.env.VITE_WEBSITE_HOST}`;
 
       if (host.endsWith(suffix)) {
         const subdomain = host.slice(0, -suffix.length);
@@ -82,7 +56,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <LazyRoute Component={IndexPage} />,
+        element: <IndexPage />,
       },
       {
         path: "/:alias/detail/:parent",
@@ -92,88 +66,58 @@ export const router = createBrowserRouter([
 
           return { fullAlias: `${params.alias}.squidl.me`, aliasId: id };
         },
-        element: <LazyRoute Component={AliasDetailPage} />,
+        element: <AliasDetailPage />,
         children: [
           {
             path: "transfer",
-            element: <LazyRoute Component={TransferPage} />,
+            element: <TransferPage />,
           },
         ],
       },
       {
         path: "/:alias/transfer",
-        element: <LazyRoute Component={TransferPage} />,
+        element: <TransferPage />,
       },
       {
         path: "/payment-links",
-        element: <LazyRoute Component={PaymentLinksPage} />,
+        element: <PaymentLinksPage />,
       },
       {
         path: "/transactions",
-        element: <LazyRoute Component={TransactionsPage} />,
+        element: <TransactionsPage />,
       },
       {
         path: "/main-details",
-        element: <LazyRoute Component={MainBalancePage} />,
+        element: <MainBalancePage />,
       },
       {
         path: "/private-details",
-        element: <LazyRoute Component={PrivateBalancePage} />,
+        element: <PrivateBalancePage />,
       },
       {
         path: "/send",
-        element: <LazyRoute Component={SendPage} />,
+        element: <SendPage />,
       },
       {
         path: "/transfer",
-        element: <LazyRoute Component={TransferPage} />,
+        element: <TransferPage />,
       },
       // Arcium Private DeFi Routes
       {
         path: "/arcium",
-        element: <LazyRoute Component={ArciumDashboard} />,
+        element: <ArciumDashboard />,
       },
       {
         path: "/arcium/swap",
-        element: <LazyRoute Component={PrivateSwapPage} />,
+        element: <PrivateSwapPage />,
       },
       {
         path: "/arcium/darkpool",
-        element: <LazyRoute Component={DarkPoolPage} />,
+        element: <DarkPoolPage />,
       },
       {
         path: "/arcium/payments",
-        element: <LazyRoute Component={PrivatePaymentsPage} />,
-      },
-      // Zcash-Aztec Integration Routes
-      {
-        path: "/aztec",
-        element: <Navigate to="/bridge" replace />,
-      },
-      {
-        path: "/bridge",
-        element: <LazyRoute Component={BridgePage} />,
-      },
-      {
-        path: "/stablecoin",
-        element: <LazyRoute Component={StablecoinPage} />,
-      },
-      {
-        path: "/mina",
-        element: <LazyRoute Component={MinaPage} />,
-      },
-      {
-        path: "/zcash",
-        element: <LazyRoute Component={ZcashPage} />,
-      },
-      {
-        path: "/zcash-mina-bridge",
-        element: <LazyRoute Component={ZcashMinaBridgePage} />,
-      },
-      // Axelar Cross-Chain Payment
-      {
-        path: "/cross-chain",
-        element: <LazyRoute Component={CrossChainPaymentPage} />,
+        element: <PrivatePaymentsPage />,
       },
     ],
   },
@@ -184,7 +128,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: ":alias_url",
-        element: <LazyRoute Component={PaymentPage} />,
+        element: <PaymentPage />,
       },
     ],
   },
