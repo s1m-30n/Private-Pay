@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "NODE_OPTIONS='--max-old-space-size=8192' vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test:e2e": "node --experimental-vm-modules --no-warnings ./node_modules/jest/bin/jest.js --config jest.config.js tests/integration",
@@ -17,7 +17,9 @@
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^5.1.5",
+    "@aptos-labs/wallet-adapter-react": "^7.2.6",
     "@arcium-hq/client": "^0.5.1",
+    "petra-plugin-wallet-adapter": "^0.4.5",
     "@coingecko/cryptoformat": "^0.8.2",
     "@coral-xyz/anchor": "^0.28.0",
     "@dynamic-labs/ethereum": "^3.1.0",

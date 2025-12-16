@@ -68,11 +68,31 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         plugins: [],
         output: {
-          // Let Vite handle chunking automatically to avoid circular dependencies
-          // and execution order issues (like "id is not a function").
-          manualChunks: undefined,
+          manualChunks(id) {
+            // Split large vendor libraries into separate chunks to reduce memory usage
+            if (id.includes('node_modules')) {
+              if (id.includes('@solana')) {
+                return 'vendor-solana';
+              }
+              if (id.includes('@aptos-labs')) {
+                return 'vendor-aptos';
+              }
+              if (id.includes('viem') || id.includes('ethers')) {
+                return 'vendor-eth';
+              }
+              if (id.includes('@dynamic-labs')) {
+                return 'vendor-dynamic';
+              }
+              if (id.includes('react') || id.includes('react-dom')) {
+                return 'vendor-react';
+              }
+              return 'vendor-other';
+            }
+          },
         },
       },
+      chunkSizeWarningLimit: 1000,
+      sourcemap: false,
     },
   };
 });
