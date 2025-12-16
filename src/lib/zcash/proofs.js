@@ -6,8 +6,7 @@
  */
 
 import { groth16 } from 'snarkjs';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+// Note: fs and path imports removed - keys should be loaded via fetch() in browser
 
 /**
  * Proof System Configuration
