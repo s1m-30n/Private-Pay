@@ -3,7 +3,8 @@
  * Handles interactions with Auro Wallet and basic Mina ZK interactions
  */
 
-import { PublicKey, Field } from 'o1js';
+// Note: o1js imports removed as they're not used and cause build issues
+// If you need PublicKey or Field validation, import them dynamically when needed
 
 export const MINA_SUBGRAPH_URL = 'https://api.minascan.io/node/devnet/v1/graphql';
 
