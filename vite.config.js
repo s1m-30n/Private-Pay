@@ -47,8 +47,6 @@ export default defineConfig(({ mode }) => {
         "@": path.resolve(__dirname, "./src"),
         // Override nested readable-stream in ripemd160/hash-base
         "readable-stream": "readable-stream",
-        // Fix poseidon-lite CommonJS/ESM interop
-        "poseidon-lite": path.resolve(__dirname, "./src/lib/poseidon-wrapper.js"),
       },
     },
     optimizeDeps: {
