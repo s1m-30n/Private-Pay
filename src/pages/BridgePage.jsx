@@ -4,7 +4,7 @@ import { useAptos } from "../providers/AptosProvider";
 import { useMina } from "../components/mina-protocol/MinaProvider";
 import { useZcash } from "../providers/ZcashProvider";
 import { sendAptTransfer } from "../lib/aptos";
-import { sendMinaPayment } from "../lib/mina"; // Mock for receiving
+import { sendMinaPayment } from "../components/mina-protocol/mina"; // Mock for receiving
 import { Icons } from "../components/shared/Icons";
 import toast from "react-hot-toast";
 import { ArrowRight, ArrowLeftRight, CheckCircle2, Lock, Unlock } from "lucide-react";
