@@ -101,6 +101,15 @@ export default function Navbar() {
           <Shield className="size-3" />
           Zcash-Mina Bridge
         </Link>
+        <Link to={"/osmosis"}
+          className={cnm(
+            "px-3 py-2 rounded-full flex items-center gap-1 transition-all duration-300",
+            `${location.pathname.startsWith("/osmosis") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <Shield className="size-3" />
+          Osmosis
+        </Link>
         <Link
           to={"/stablecoin"}
           className={cnm(

@@ -27,6 +27,7 @@ const ZcashPage = lazy(() => import("./pages/ZcashPage.jsx"));
 const ZcashMinaBridgePage = lazy(() => import("./pages/ZcashMinaBridgePage.jsx"));
 // Axelar Cross-Chain Payments
 const CrossChainPaymentPage = lazy(() => import("./pages/CrossChainPaymentPage.jsx"));
+const OsmosisPage = lazy(() => import("./pages/OsmosisPage.jsx"));
 
 // Loading component
 const PageLoader = () => (
@@ -174,6 +175,11 @@ export const router = createBrowserRouter([
       {
         path: "/cross-chain",
         element: <LazyRoute Component={CrossChainPaymentPage} />,
+      },
+      // Cosmos / Osmosis Integration
+      {
+        path: "/osmosis",
+        element: <LazyRoute Component={OsmosisPage} />,
       },
     ],
   },
