@@ -304,6 +304,24 @@ function MergedBalanceCard({ balance, isLoading }) {
               History
             </Button>
           </div>
+          {/* Privacy Features Section */}
+          <div className="w-full mt-4 pt-4 border-t border-gray-100">
+            <p className="text-xs font-medium text-gray-500 mb-2 text-center">Privacy Features</p>
+            <div className="w-full flex items-center gap-2">
+              <Button
+                onClick={() => navigate("/arcium")}
+                className="flex-1 rounded-full h-11 bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-600 font-medium text-sm border border-purple-100"
+              >
+                Arcium DeFi
+              </Button>
+              <Button
+                onClick={() => navigate("/solana-zcash-bridge")}
+                className="flex-1 rounded-full h-11 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-600 font-medium text-sm border border-amber-100"
+              >
+                SOL↔ZEC Bridge
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

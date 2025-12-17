@@ -1,12 +1,13 @@
 [toolchain]
-anchor_version = "0.30.1"
+anchor_version = "0.29.0"
 
 [features]
 resolution = true
 skip-lint = false
 
 [programs.devnet]
-private_pay = "3tFjfuwwpWkEJfo5JYTFyozc4rEa8ysksgWJUcUq3qTx"
+private_pay = "3G25P6tjmadLYHivYXhToAER7H5hwkkFJcdoDHziNUkm"
+zcash_bridge = "7JMw1zWJE5Di2VAHbNFGWVxQLRjGDmz5qB488aUgDp8x"
 
 [registry]
 url = "https://api.apr.dev"
