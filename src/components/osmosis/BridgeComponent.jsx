@@ -1,22 +1,68 @@
-import React, { useState } from 'react';
+import { useChain } from '@cosmos-kit/react';
+import { coins } from '@cosmjs/amino';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 
+// PrivatePay Bridge Vault on Osmosis
+const BRIDGE_VAULT_ADDRESS = 'osmo18s5lynnx550aw5rqlmg32cne6083893nq8p5q4'; 
+
 export const BridgeComponent = () => {
+  const { address, getSigningStargateClient } = useChain('osmosis');
   const [amount, setAmount] = useState('');
   const [isBridging, setIsBridging] = useState(false);
   const [step, setStep] = useState('idle'); // idle, signing, bridging, completed
+  const [txHash, setTxHash] = useState('');
 
   const handleBridge = async () => {
-    if (!amount) return;
+    if (!amount || !address) return;
+    
     setIsBridging(true);
     setStep('signing');
-    
-    // Simulate delays
-    setTimeout(() => setStep('bridging'), 1500);
-    setTimeout(() => {
-        setStep('completed');
+
+    try {
+        const client = await getSigningStargateClient();
+        
+        // 1. Convert amount to uosmo (6 decimals)
+        const microAmount = Math.floor(parseFloat(amount) * 1_000_000).toString();
+        
+        const fee = {
+            amount: coins(5000, 'uosmo'),
+            gas: '200000'
+        };
+
+        
+        
+        const memo = `BRIDGE_TO_ZCASH:zs1...`; 
+
+        const result = await client.sendTokens(
+            address,
+            BRIDGE_VAULT_ADDRESS,
+            coins(microAmount, 'uosmo'),
+            fee,
+            memo
+        );
+
+        if (result.code === 0) {
+            setTxHash(result.transactionHash);
+            setStep('bridging');
+            // Simulate bridge operator time (on-chain part is done)
+            setTimeout(() => {
+                setStep('completed');
+                setIsBridging(false);
+            }, 2000);
+        } else {
+            console.error('Transaction Failed:', result);
+            setIsBridging(false);
+            setStep('idle');
+            alert(`Transaction failed: ${result.rawLog}`);
+        }
+
+    } catch (error) {
+        console.error('Bridge Error:', error);
         setIsBridging(false);
-    }, 4500);
+        setStep('idle');
+        alert(error.message);
+    }
   };
 
   return (
@@ -78,9 +124,19 @@ export const BridgeComponent = () => {
         </div>
 
         {step === 'completed' ? (
-             <div className="bg-green-900/20 border border-green-900 rounded-lg p-4 text-center">
-                 <p className="text-green-400 font-bold mb-1">Bridge Successful!</p>
-                 <p className="text-xs text-green-600">Assets are now in Zcash Shielded Pool.</p>
+             <div className="bg-green-900/20 border  rounded-lg p-4 text-center">
+                 <p className=" font-bold mb-1">Bridge Successful!</p>
+                 <p className="text-xs text-green-600">Assets sent to Bridge Vault.</p>
+                 {txHash && (
+                    <a 
+                        href={`https://www.mintscan.io/osmosis/tx/${txHash}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-[10px] text-gray-500 hover:text-purple-400 block mt-1 break-all"
+                    >
+                        TX: {txHash}
+                    </a>
+                 )}
                  <button onClick={() => setStep('idle')} className="text-xs text-gray-400 underline mt-2 hover:text-white">Bridge more</button>
              </div>
         ) : (
