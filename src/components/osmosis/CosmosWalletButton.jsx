@@ -1,8 +1,8 @@
 import React from 'react';
 import { useChain } from '@cosmos-kit/react';
 
-export function CosmosWalletButton() {
-  const { status, username, address, connect, disconnect, wallet } = useChain('osmosis');
+export const CosmosWalletButton = ({ chainName = 'osmosis' }) => {
+  const { status, username, address, connect, disconnect, wallet } = useChain(chainName);
 
   if (status === 'Connected') {
     return (

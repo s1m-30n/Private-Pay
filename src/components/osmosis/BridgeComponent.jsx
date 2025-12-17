@@ -2,25 +2,45 @@ import { useChain } from '@cosmos-kit/react';
 import { coins } from '@cosmjs/amino';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
-// PrivatePay Bridge Vault on Osmosis
-const BRIDGE_VAULT_ADDRESS = 'osmo18s5lynnx550aw5rqlmg32cne6083893nq8p5q4'; 
+// PrivatePay Bridge Vaults
+const VAULTS = {
+    'osmosis': 'osmo18s5lynnx550aw5rqlmg32cne6083893nq8p5q4', // Mainnet
+    'osmosistestnet': 'osmo18s5lynnx550aw5rqlmg32cne6083893nq8p5q4' // Testnet
+};
 
-export const BridgeComponent = () => {
-  const { address, getSigningStargateClient } = useChain('osmosis');
+import { SigningStargateClient } from '@cosmjs/stargate';
+
+// ... (imports remain)
+
+export const BridgeComponent = ({ chainName = 'osmosis' }) => {
+  // Destructure getOfflineSigner and getRpcEndpoint or use chain info directly
+  const { address, getOfflineSigner, chain } = useChain(chainName); 
+  
   const [amount, setAmount] = useState('');
   const [isBridging, setIsBridging] = useState(false);
   const [step, setStep] = useState('idle'); // idle, signing, bridging, completed
   const [txHash, setTxHash] = useState('');
 
   const handleBridge = async () => {
-    if (!amount || !address) return;
+    // ... (validations remain)
     
     setIsBridging(true);
     setStep('signing');
 
     try {
-        const client = await getSigningStargateClient();
+        // MANUAL CONNECTION Logic (More Robust)
+        const offlineSigner = getOfflineSigner();
+        if (!offlineSigner) throw new Error("Wallet not connected");
+        
+        // Find RPC endpoint (use the first one available or fallback)
+        const rpcEndpoint = chain?.apis?.rpc?.[0]?.address || 'https://rpc.osmosis.zone';
+        
+        const client = await SigningStargateClient.connectWithSigner(
+            rpcEndpoint, 
+            offlineSigner
+        );
         
         // 1. Convert amount to uosmo (6 decimals)
         const microAmount = Math.floor(parseFloat(amount) * 1_000_000).toString();
@@ -30,13 +50,11 @@ export const BridgeComponent = () => {
             gas: '200000'
         };
 
-        
-        
         const memo = `BRIDGE_TO_ZCASH:zs1...`; 
 
         const result = await client.sendTokens(
             address,
-            BRIDGE_VAULT_ADDRESS,
+            VAULTS[chainName],
             coins(microAmount, 'uosmo'),
             fee,
             memo
@@ -54,14 +72,14 @@ export const BridgeComponent = () => {
             console.error('Transaction Failed:', result);
             setIsBridging(false);
             setStep('idle');
-            alert(`Transaction failed: ${result.rawLog}`);
+            toast.error(`Transaction failed: ${result.rawLog}`);
         }
 
     } catch (error) {
         console.error('Bridge Error:', error);
         setIsBridging(false);
         setStep('idle');
-        alert(error.message);
+        toast.error(`Bridge Failed: ${error.message}`);
     }
   };
 
@@ -141,14 +159,14 @@ export const BridgeComponent = () => {
              </div>
         ) : (
             <button
-                disabled={!amount || isBridging}
+                disabled={isBridging} // Only disable while processing, enabled even if validation fails so we can show toasts
                 onClick={handleBridge}
                 className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
-                    !amount 
-                    ? 'bg-gray-800 text-gray-500 cursor-not-allowed' 
-                    : isBridging 
+                    isBridging 
                         ? 'bg-gray-800 text-white cursor-wait'
-                        : 'text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-900/20'
+                        : !amount 
+                            ? 'bg-gray-800 text-gray-500 hover:bg-gray-700 cursor-pointer' // Visual hint but clickable
+                            : 'text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-900/20'
                 }`}
             >
                 {step === 'signing' ? 'Signing Transaction...' : 

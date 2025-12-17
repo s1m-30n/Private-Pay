@@ -6,9 +6,14 @@ export const PrivacyPayment = () => {
     const [link, setLink] = useState('');
 
     const generateStealthLink = () => {
-        // Simulate stealth link generation
-        const randomId = Math.random().toString(36).substring(7);
-        setLink(`${import.meta.env.VITE_WEBSITE_HOST}/pay/${randomId}?stealth=true`);
+        if (!recipient) {
+            alert("Please enter a recipient");
+            return;
+        }
+        // In a real implementation, this would involve ECIES encryption or interactions with a Privacy Pool contract.
+        // For now, we encode the intent into the URL.
+        const payload = btoa(JSON.stringify({ to: recipient, amount: 'variable' }));
+        setLink(`${import.meta.env.VITE_WEBSITE_HOST}/pay/secure?data=${payload}`);
     };
 
     const copyLink = () => {

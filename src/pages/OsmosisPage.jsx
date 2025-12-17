@@ -6,13 +6,16 @@ import { PrivacyPayment } from '../components/osmosis/PrivacyPayment';
 import { motion } from 'framer-motion';
 
 export default function OsmosisPage() {
-  const { address, status, getCosmWasmClient } = useChain('osmosis');
+  const [selectedChain, setSelectedChain] = useState('osmosis'); // 'osmosis' or 'osmosistestnet'
+  const { address, status, getCosmWasmClient } = useChain(selectedChain);
   const [balance, setBalance] = useState(null);
+  const [osmoPrice, setOsmoPrice] = useState(0);
   const [loading, setLoading] = useState(false);
   const [privacyMode, setPrivacyMode] = useState(false);
 
   useEffect(() => {
-    async function fetchBalance() {
+    async function fetchData() {
+        // Fetch Balance
       if (status === 'Connected' && address) {
         try {
           setLoading(true);
@@ -27,9 +30,18 @@ export default function OsmosisPage() {
       } else {
         setBalance(null);
       }
+
+      // Fetch Real Price
+      try {
+          const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=osmosis&vs_currencies=usd');
+          const data = await response.json();
+          setOsmoPrice(data.osmosis.usd);
+      } catch (e) {
+          console.error("Failed to fetch price", e);
+      }
     }
-    fetchBalance();
-  }, [status, address, getCosmWasmClient]);
+    fetchData();
+  }, [status, address, getCosmWasmClient, selectedChain]);
 
   const togglePrivacy = () => setPrivacyMode(!privacyMode);
 
@@ -41,7 +53,23 @@ export default function OsmosisPage() {
                     <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-600">
                         Osmosis Privacy Layer
                     </h1>
-                    <p className="text-gray-400 mt-2">Interchain Shielded Pool & Asset Bridge</p>
+                    <div className="flex items-center gap-3 mt-2">
+                        <p className="text-gray-400">Interchain Shielded Pool & Asset Bridge</p>
+                        <div className="bg-gray-100 p-1 rounded-lg flex items-center border border-gray-200">
+                            <button 
+                                onClick={() => setSelectedChain('osmosis')}
+                                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${selectedChain === 'osmosis' ? 'bg-white shadow text-purple-600' : 'text-gray-400 hover:text-gray-600'}`}
+                            >
+                                Mainnet
+                            </button>
+                            <button 
+                                onClick={() => setSelectedChain('osmosistestnet')}
+                                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${selectedChain === 'osmosistestnet' ? 'bg-white shadow text-purple-600' : 'text-gray-400 hover:text-gray-600'}`}
+                            >
+                                Testnet
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div className="flex items-center gap-4">
                     <button 
@@ -59,7 +87,7 @@ export default function OsmosisPage() {
                         )}
                         {privacyMode ? 'Privacy ON' : 'Privacy OFF'}
                     </button>
-                    <CosmosWalletButton />
+                    <CosmosWalletButton chainName={selectedChain} />
                 </div>
             </header>
 
@@ -79,7 +107,7 @@ export default function OsmosisPage() {
                         <div className=" p-4 rounded-lg border border-gray-800/20">
                              <span className="text-gray-500 text-sm block mb-1">Total Balance</span>
                              <span className={`text-3xl font-mono font-bold ${privacyMode ? 'blur-md' : ''} transition-all duration-300`}>
-                                 {loading ? '...' : privacyMode ? '$0.00' : balance ? `$${(Number(balance.amount) / 1_000_000 * 1.5).toFixed(2)}` : '$0.00'}
+                                 {loading ? '...' : privacyMode ? '$0.00' : balance ? `$${(Number(balance.amount) / 1_000_000 * osmoPrice).toFixed(2)}` : '$0.00'}
                              </span>
                         </div>
 
@@ -94,7 +122,7 @@ export default function OsmosisPage() {
 
                 {/* Bridge Component - New */}
                 <div className="lg:col-span-2">
-                     <BridgeComponent />
+                     <BridgeComponent chainName={selectedChain} />
                 </div>
 
                 {/* Privacy Payment Form - New */}
