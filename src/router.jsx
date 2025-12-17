@@ -25,6 +25,11 @@ const StablecoinPage = lazy(() => import("./pages/StablecoinPage.jsx"));
 const MinaPage = lazy(() => import("./components/mina-protocol/MinaPage.jsx"));
 const ZcashPage = lazy(() => import("./pages/ZcashPage.jsx"));
 const ZcashMinaBridgePage = lazy(() => import("./pages/ZcashMinaBridgePage.jsx"));
+// Starknet Integration
+const StarknetPage = lazy(() => import("./pages/StarknetPage.jsx"));
+const ZcashStarknetBridgePage = lazy(() => import("./pages/ZcashStarknetBridgePage.jsx"));
+const ZtarknetLendingPage = lazy(() => import("./pages/ZtarknetLendingPage.jsx"));
+const ZtarknetSwapPage = lazy(() => import("./pages/ZtarknetSwapPage.jsx"));
 // Axelar Cross-Chain Payments
 const CrossChainPaymentPage = lazy(() => import("./pages/CrossChainPaymentPage.jsx"));
 const OsmosisPage = lazy(() => import("./pages/OsmosisPage.jsx"));
@@ -170,6 +175,23 @@ export const router = createBrowserRouter([
       {
         path: "/zcash-mina-bridge",
         element: <LazyRoute Component={ZcashMinaBridgePage} />,
+      },
+      // Starknet Integration Routes
+      {
+        path: "/starknet",
+        element: <LazyRoute Component={StarknetPage} />,
+      },
+      {
+        path: "/zcash-starknet-bridge",
+        element: <LazyRoute Component={ZcashStarknetBridgePage} />,
+      },
+      {
+        path: "/ztarknet-lending",
+        element: <LazyRoute Component={ZtarknetLendingPage} />,
+      },
+      {
+        path: "/ztarknet-swap",
+        element: <LazyRoute Component={ZtarknetSwapPage} />,
       },
       // Axelar Cross-Chain Payment
       {

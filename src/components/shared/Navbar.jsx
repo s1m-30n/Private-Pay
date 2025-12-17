@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { DollarSign, LayoutDashboard, Wallet, Shield, Lock, ArrowLeftRight } from "lucide-react";
+import { DollarSign, LayoutDashboard, Wallet, Shield, Lock, ArrowLeftRight, Zap } from "lucide-react";
 import { cnm } from "../../utils/style.js";
 
 export default function Navbar() {
@@ -110,6 +110,15 @@ export default function Navbar() {
           <Shield className="size-3" />
           Osmosis
         </Link>
+        <Link to={"/zcash-starknet-bridge"}
+          className={cnm(
+            "px-3 py-2 rounded-full flex items-center gap-1 transition-all duration-300",
+            `${location.pathname.startsWith("/zcash-starknet-bridge") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <Zap className="size-3" />
+          Zcash-Starknet Bridge
+        </Link>
         <Link
           to={"/stablecoin"}
           className={cnm(
@@ -119,6 +128,16 @@ export default function Navbar() {
         >
           <Shield className="size-3" />
           Stablecoin
+        </Link>
+        <Link
+          to={"/starknet"}
+          className={cnm(
+            "px-3 py-2 rounded-full flex items-center gap-1 transition-all duration-300",
+            `${location.pathname.startsWith("/starknet") || location.pathname.startsWith("/ztarknet") || location.pathname.startsWith("/zcash-starknet") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <Zap className="size-3" />
+          Starknet
         </Link>
 
         <Link
