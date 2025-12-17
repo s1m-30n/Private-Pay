@@ -6,6 +6,7 @@ import AptosProvider from "./AptosProvider.jsx";
 import SolanaProvider from "./SolanaProvider.jsx";
 import MinaProvider from "../components/mina-protocol/MinaProvider";
 import ZcashProvider from "./ZcashProvider.jsx";
+import StarknetProvider from "./StarknetProvider.jsx";
 import { SWRConfig } from "swr";
 import UserProvider from "./UserProvider.jsx";
 
@@ -23,17 +24,19 @@ export default function RootProvider({ children }) {
         <SolanaProvider>
           <MinaProvider>
             <ZcashProvider>
-              <AptosProvider isTestnet={isTestnet}>
-                <DynamicProvider>
-                  <Web3Provider>
-                    <AuthProvider>
-                      <UserProvider>
-                        {children}
-                      </UserProvider>
-                    </AuthProvider>
-                  </Web3Provider>
-                </DynamicProvider>
-              </AptosProvider>
+              <StarknetProvider>
+                <AptosProvider isTestnet={isTestnet}>
+                  <DynamicProvider>
+                    <Web3Provider>
+                      <AuthProvider>
+                        <UserProvider>
+                          {children}
+                        </UserProvider>
+                      </AuthProvider>
+                    </Web3Provider>
+                  </DynamicProvider>
+                </AptosProvider>
+              </StarknetProvider>
             </ZcashProvider>
           </MinaProvider>
         </SolanaProvider>

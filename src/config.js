@@ -91,6 +91,23 @@ export const TESTNET_CHAINS = [
     rpcUrls: ["https://sepolia.drpc.org"],
     vanityName: "Ethereum Sepolia",
   },
+  // Starknet Sepolia
+  {
+    blockExplorerUrls: ["https://sepolia.starkscan.co"],
+    chainId: 0x534e5f5345504f4c4941, // SN_SEPOLIA
+    chainName: "Starknet Sepolia",
+    iconUrls: ["https://starknet.io/favicon.ico"],
+    name: "Starknet Sepolia",
+    nativeCurrency: {
+      name: "Ethereum",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    networkId: 0x534e5f5345504f4c4941,
+    rpcUrls: ["https://starknet-sepolia-rpc.publicnode.com"],
+    vanityName: "Starknet Sepolia",
+    isStarknet: true,
+  },
   // Aptos Testnet (Note: Aptos uses different wallet system, not EVM)
   {
     blockExplorerUrls: ["https://explorer.aptoslabs.com/?network=testnet"],
@@ -243,5 +260,30 @@ export const CHAINS = [
     isTestnet: false,
     network: "mainnet",
     isAptos: true,
+  },
+  // Starknet Chains
+  {
+    id: "SN_SEPOLIA",
+    name: "Starknet Sepolia",
+    chainlistUrl: "https://chainlist.org",
+    rpcUrl: "https://starknet-sepolia-rpc.publicnode.com",
+    nativeToken: "ETH",
+    blockExplorerUrl: "https://sepolia.starkscan.co",
+    imageUrl: "https://starknet.io/favicon.ico",
+    isTestnet: true,
+    network: "testnet",
+    isStarknet: true,
+  },
+  {
+    id: "SN_MAIN",
+    name: "Starknet Mainnet",
+    chainlistUrl: "https://chainlist.org",
+    rpcUrl: "https://starknet-mainnet-rpc.publicnode.com",
+    nativeToken: "ETH",
+    blockExplorerUrl: "https://starkscan.co",
+    imageUrl: "https://starknet.io/favicon.ico",
+    isTestnet: false,
+    network: "mainnet",
+    isStarknet: true,
   },
 ];

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Shield, Lock, ArrowLeftRight, Coins, Database } from "lucide-react";
+import { Shield, Lock, ArrowLeftRight, Coins, Database, Zap, TrendingUp, RefreshCw } from "lucide-react";
 import { cnm } from "../../utils/style.js";
 
 export default function PrivacyNavbar() {
@@ -67,6 +67,46 @@ export default function PrivacyNavbar() {
                 >
                     <Coins className="size-4" />
                     Stablecoin
+                </Link>
+                <Link
+                    to={"/starknet"}
+                    className={cnm(
+                        "px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 hover:bg-purple-50",
+                        `${location.pathname.startsWith("/starknet") ? "bg-purple-600 text-white hover:bg-purple-700 shadow-md shadow-purple-200" : "text-gray-600"}`
+                    )}
+                >
+                    <Zap className="size-4" />
+                    Starknet
+                </Link>
+                <Link
+                    to={"/zcash-starknet-bridge"}
+                    className={cnm(
+                        "px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 hover:bg-indigo-50",
+                        `${location.pathname.startsWith("/zcash-starknet-bridge") ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200" : "text-gray-600"}`
+                    )}
+                >
+                    <Shield className="size-4" />
+                    Ztarknet
+                </Link>
+                <Link
+                    to={"/ztarknet-lending"}
+                    className={cnm(
+                        "px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 hover:bg-violet-50",
+                        `${location.pathname.startsWith("/ztarknet-lending") ? "bg-violet-600 text-white hover:bg-violet-700 shadow-md shadow-violet-200" : "text-gray-600"}`
+                    )}
+                >
+                    <TrendingUp className="size-4" />
+                    Lending
+                </Link>
+                <Link
+                    to={"/ztarknet-swap"}
+                    className={cnm(
+                        "px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 hover:bg-cyan-50",
+                        `${location.pathname.startsWith("/ztarknet-swap") ? "bg-cyan-600 text-white hover:bg-cyan-700 shadow-md shadow-cyan-200" : "text-gray-600"}`
+                    )}
+                >
+                    <RefreshCw className="size-4" />
+                    Swap
                 </Link>
             </div>
         </div>
