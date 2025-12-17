@@ -378,6 +378,21 @@ export default function StarknetProvider({ children }) {
       throw new Error("Swap contract not deployed");
     }
 
+    console.log("═══════════════════════════════════════════════════════════");
+    console.log("🔄 ATOMIC SWAP - INITIATE");
+    console.log("═══════════════════════════════════════════════════════════");
+    console.log("📋 Contract: AtomicSwap (HTLC)");
+    console.log("📍 Address:", swapAddress);
+    console.log("🔧 Function: initiate_swap()");
+    console.log("📦 Swap Details:");
+    console.log("   • ZEC Amount:", zecAmount);
+    console.log("   • Starknet Asset:", starknetAsset);
+    console.log("   • Starknet Amount:", starknetAmount);
+    console.log("   • Recipient:", recipient);
+    console.log("   • Hashlock:", hashlock);
+    console.log("   • Timelock:", timelock, "seconds");
+    console.log("⏳ Sending transaction to Starknet Sepolia...");
+
     try {
       const zecUint256 = uint256.bnToUint256(BigInt(Math.floor(zecAmount * 1e8)));
       const starknetUint256 = uint256.bnToUint256(BigInt(Math.floor(starknetAmount * 1e18)));
@@ -395,9 +410,15 @@ export default function StarknetProvider({ children }) {
         ],
       }]);
 
+      console.log("✅ Swap Initiated!");
+      console.log("🔗 Tx Hash:", result.transaction_hash);
+      console.log("🌐 Explorer: https://sepolia.starkscan.co/tx/" + result.transaction_hash);
+      console.log("═══════════════════════════════════════════════════════════\n");
+
       toast.success("Swap initiated successfully!");
       return result;
     } catch (error) {
+      console.error("❌ Swap Initiation Failed:", error.message);
       toast.error(`Swap initiation failed: ${error.message}`);
       throw error;
     }
@@ -577,6 +598,17 @@ export default function StarknetProvider({ children }) {
       throw new Error("Bridge contract not deployed");
     }
 
+    console.log("═══════════════════════════════════════════════════════════");
+    console.log("🌉 ZCASH BRIDGE - BURN sZEC FOR WITHDRAWAL");
+    console.log("═══════════════════════════════════════════════════════════");
+    console.log("📋 Contract: ZcashBridge");
+    console.log("📍 Address:", bridgeAddress);
+    console.log("🔧 Function: burn_szec()");
+    console.log("📦 Withdrawal Details:");
+    console.log("   • Amount:", amount, "sZEC");
+    console.log("   • Zcash Address Hash:", zcashAddressHash);
+    console.log("⏳ Sending transaction to Starknet Sepolia...");
+
     try {
       const amountUint256 = uint256.bnToUint256(BigInt(Math.floor(amount * 1e8)));
 
@@ -586,10 +618,17 @@ export default function StarknetProvider({ children }) {
         calldata: [amountUint256.low, amountUint256.high, zcashAddressHash],
       }]);
 
+      console.log("✅ sZEC Burned Successfully!");
+      console.log("🔗 Tx Hash:", result.transaction_hash);
+      console.log("🌐 Explorer: https://sepolia.starkscan.co/tx/" + result.transaction_hash);
+      console.log("📤 Withdrawal ID generated - ZEC will be sent to Zcash shielded address");
+      console.log("═══════════════════════════════════════════════════════════\n");
+
       toast.success("Withdrawal initiated! ZEC will arrive shortly.");
       await updateBalance(account);
       return result;
     } catch (error) {
+      console.error("❌ Withdrawal Failed:", error.message);
       toast.error(`Withdrawal failed: ${error.message}`);
       throw error;
     }
