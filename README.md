@@ -251,56 +251,46 @@ Below is a concise, technical view of how the full PrivatePay system is wired ac
 ### High-Level Architecture
 
 ```mermaid
-flowchart LR
-  subgraph User
-    UI[PrivatePay Web App]
-  end
+sequenceDiagram
+  participant User
+  participant UI as PrivatePay Web App
+  participant Wallet as Wallet Adapters
+  participant Chain as Blockchain Networks
+  participant Infra as Infrastructure Services
+  participant Relayer as Bridge Relayers
 
-  subgraph Wallets
-    APTOS[Petra Aptos]
-    SOL[Phantom Solflare]
-    STARK[ArgentX Braavos]
-    OSMO[Keplr Leap]
-    MINA[Auro]
-    NEARW[Near Wallet]
-    EVMW[EVM Wallets]
-  end
+  User->>UI: Open PrivatePay
+  UI->>Supabase: Load user data, payment links
+  Supabase-->>UI: User state, balances
 
-  subgraph Chains
-    Aptos[Aptos]
-    Solana[Solana Arcium]
-    Starknet[Starknet Ztarknet]
-    Osmosis[Osmosis]
-    Mina[Mina]
-    Zcash[Zcash]
-    Miden[Miden]
-    Near[Near Protocol]
-    Fhenix[Fhenix]
-  end
+  User->>UI: Connect wallet
+  UI->>Wallet: Request connection
+  Wallet-->>UI: Account addresses, network
 
-  subgraph Infra
-    Supabase[(Supabase DB)]
-    Helius[(Helius RPC)]
-    Axelar[(Axelar GMP)]
-    AztecL2[(Aztec L2)]
-    ArciumMPC[(Arcium MPC)]
-    Relayer[Relayers ZK Provers]
-  end
+  User->>UI: Initiate private payment
+  UI->>Wallet: Sign transaction
+  Wallet->>Chain: Broadcast transaction
+  Chain-->>Wallet: Transaction hash
+  Wallet-->>UI: Confirmation
 
-  UI --> Wallets
-  Wallets --> Chains
+  Note over Chain,Infra: Chain-specific integrations
 
-  UI --> Supabase
-  Solana --> Helius
-  Solana --> ArciumMPC
-  Starknet --> AztecL2
-  Near --> Axelar
-  Fhenix --> Axelar
+  Chain->>Helius: Solana enhanced RPC
+  Chain->>ArciumMPC: Private DeFi operations
+  Chain->>AztecL2: Starknet privacy layer
+  Chain->>Axelar: Cross-chain messaging
 
-  Zcash <-- Relayer --> Miden
-  Zcash <-- Relayer --> Starknet
-  Zcash <-- Relayer --> Solana
-  Zcash <-- Relayer --> Osmosis
+  Note over Relayer,Chain: Zcash bridge operations
+
+  Relayer->>Zcash: Monitor deposits
+  Zcash-->>Relayer: Transaction events
+  Relayer->>Miden: Relay to Miden
+  Relayer->>Starknet: Relay to Starknet
+  Relayer->>Solana: Relay to Solana
+  Relayer->>Osmosis: Relay to Osmosis
+
+  Chain-->>UI: Updated balances, state
+  UI-->>User: Show transaction status
 ```
 
 At the center is the **React/Vite** app, which talks to wallets, chains, Supabase, and relayer backends. Privacy is enforced through:
