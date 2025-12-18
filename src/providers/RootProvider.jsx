@@ -8,6 +8,7 @@ import MinaProvider from "../components/mina-protocol/MinaProvider";
 import ZcashProvider from "./ZcashProvider.jsx";
 import { CosmosProvider } from "./CosmosProvider.jsx";
 import StarknetProvider from "./StarknetProvider.jsx";
+import UnstoppableProvider from "./UnstoppableProvider.jsx";
 import { SWRConfig } from "swr";
 import UserProvider from "./UserProvider.jsx";
 
@@ -26,19 +27,21 @@ export default function RootProvider({ children }) {
           <MinaProvider>
             <CosmosProvider>
               <ZcashProvider>
-                <StarknetProvider>
-                  <AptosProvider isTestnet={isTestnet}>
-                    <DynamicProvider>
-                      <Web3Provider>
-                        <AuthProvider>
-                          <UserProvider>
-                            {children}
-                          </UserProvider>
-                        </AuthProvider>
-                      </Web3Provider>
-                    </DynamicProvider>
-                  </AptosProvider>
-                </StarknetProvider>
+                <UnstoppableProvider>
+                  <StarknetProvider>
+                    <AptosProvider isTestnet={isTestnet}>
+                      <DynamicProvider>
+                        <Web3Provider>
+                          <AuthProvider>
+                            <UserProvider>
+                              {children}
+                            </UserProvider>
+                          </AuthProvider>
+                        </Web3Provider>
+                      </DynamicProvider>
+                    </AptosProvider>
+                  </StarknetProvider>
+                </UnstoppableProvider>
               </ZcashProvider>
             </CosmosProvider>
           </MinaProvider>

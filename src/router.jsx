@@ -33,6 +33,8 @@ const ZtarknetSwapPage = lazy(() => import("./pages/ZtarknetSwapPage.jsx"));
 // Axelar Cross-Chain Payments
 const CrossChainPaymentPage = lazy(() => import("./pages/CrossChainPaymentPage.jsx"));
 const OsmosisPage = lazy(() => import("./pages/OsmosisPage.jsx"));
+// Unstoppable Wallet - Self-Custody with Zcash Privacy
+const UnstoppableDashboard = lazy(() => import("./pages/UnstoppableDashboard.jsx"));
 // Solana-Zcash Bridge (Helius-powered)
 const SolanaZcashBridgePage = lazy(() => import("./pages/SolanaZcashBridgePage.jsx"));
 
@@ -204,6 +206,11 @@ export const router = createBrowserRouter([
       {
         path: "/osmosis",
         element: <LazyRoute Component={OsmosisPage} />,
+      },
+      // Unstoppable Wallet - Zcash Self-Custody
+      {
+        path: "/unstoppable",
+        element: <LazyRoute Component={UnstoppableDashboard} />,
       },
       // Solana-Zcash Bridge (Helius-powered)
       {

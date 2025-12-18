@@ -11,7 +11,8 @@ import {
   Network,
   TrendingUp,
   Repeat,
-  ChevronDown
+  ChevronDown,
+  Fingerprint
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { cnm } from "../../utils/style.js";
@@ -76,11 +77,36 @@ export default function Navbar() {
 
         <div className="w-px h-6 bg-black/10 mx-0.5" />
 
-        {/* Privacy Chains */}
+        {/* Wallets & Privacy */}
+        <Link
+          to={"/unstoppable"}
+          className={cnm(
+            "px-3 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
+            `${location.pathname.startsWith("/unstoppable") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <Fingerprint className="size-3.5" />
+          <span>Unstoppable</span>
+        </Link>
+
+        <Link
+          to={"/zcash"}
+          className={cnm(
+            "px-2.5 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
+            `${location.pathname.startsWith("/zcash") && !location.pathname.includes("bridge") && !location.pathname.includes("starknet") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <Shield className="size-3.5" />
+          <span>Zcash</span>
+        </Link>
+
+        <div className="w-px h-6 bg-black/10 mx-0.5" />
+
+        {/* Privacy Protocols */}
         <Link
           to={"/arcium"}
           className={cnm(
-            "px-3 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
+            "px-2.5 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
             `${location.pathname.startsWith("/arcium") ? "bg-primary text-white" : ""}`
           )}
         >
@@ -91,7 +117,7 @@ export default function Navbar() {
         <Link
           to={"/aztec"}
           className={cnm(
-            "px-3 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
+            "px-2.5 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
             `${location.pathname.startsWith("/aztec") || location.pathname.startsWith("/bridge") ? "bg-primary text-white" : ""}`
           )}
         >
@@ -102,70 +128,12 @@ export default function Navbar() {
         <Link
           to={"/mina"}
           className={cnm(
-            "px-3 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
+            "px-2.5 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
             `${location.pathname.startsWith("/mina") ? "bg-primary text-white" : ""}`
           )}
         >
           <Network className="size-3.5" />
           <span>Mina</span>
-        </Link>
-
-        <Link
-          to={"/osmosis"}
-          className={cnm(
-            "px-3 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
-            `${location.pathname.startsWith("/osmosis") ? "bg-primary text-white" : ""}`
-          )}
-        >
-          <Coins className="size-3.5" />
-          <span>Osmosis</span>
-        </Link>
-
-        <Link
-          to={"/zcash"}
-          className={cnm(
-            "px-3 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
-            `${location.pathname.startsWith("/zcash") && !location.pathname.includes("bridge") && !location.pathname.includes("starknet") ? "bg-primary text-white" : ""}`
-          )}
-        >
-          <Shield className="size-3.5" />
-          <span>Zcash</span>
-        </Link>
-
-        <div className="w-px h-6 bg-black/10 mx-0.5" />
-
-        {/* Bridges */}
-        <Link
-          to={"/bridge"}
-          className={cnm(
-            "px-3 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
-            `${location.pathname === "/bridge" ? "bg-primary text-white" : ""}`
-          )}
-        >
-          <ArrowLeftRight className="size-3.5" />
-          <span>Bridge</span>
-        </Link>
-
-        <Link
-          to={"/zcash-mina-bridge"}
-          className={cnm(
-            "px-2.5 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
-            `${location.pathname.startsWith("/zcash-mina-bridge") ? "bg-primary text-white" : ""}`
-          )}
-        >
-          <ArrowLeftRight className="size-3.5" />
-          <span>ZEC-Mina</span>
-        </Link>
-
-        <Link
-          to={"/solana-zcash-bridge"}
-          className={cnm(
-            "px-2.5 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
-            `${location.pathname.startsWith("/solana-zcash-bridge") ? "bg-primary text-white" : ""}`
-          )}
-        >
-          <ArrowLeftRight className="size-3.5" />
-          <span>Sol-ZEC</span>
         </Link>
 
         <div className="w-px h-6 bg-black/10 mx-0.5" />
@@ -272,28 +240,65 @@ export default function Navbar() {
             </div>
         )}
 
-        {/* DeFi */}
-        <Link
-          to={"/stablecoin"}
-          className={cnm(
-            "px-3 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
-            `${location.pathname.startsWith("/stablecoin") ? "bg-primary text-white" : ""}`
-          )}
-        >
-          <Coins className="size-3.5" />
-          <span>Stablecoin</span>
-        </Link>
+        <div className="w-px h-6 bg-black/10 mx-0.5" />
 
-        {/* Cross-Chain */}
+        {/* Cross-Chain & Bridges */}
         <Link
           to={"/cross-chain"}
           className={cnm(
-            "px-3 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
+            "px-2.5 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
             `${location.pathname === "/cross-chain" ? "bg-primary text-white" : ""}`
           )}
         >
           <ArrowLeftRight className="size-3.5" />
           <span>Axelar</span>
+        </Link>
+
+        <Link
+          to={"/osmosis"}
+          className={cnm(
+            "px-2.5 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
+            `${location.pathname.startsWith("/osmosis") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <Coins className="size-3.5" />
+          <span>Osmosis</span>
+        </Link>
+
+        <Link
+          to={"/solana-zcash-bridge"}
+          className={cnm(
+            "px-2.5 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
+            `${location.pathname.startsWith("/solana-zcash-bridge") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <ArrowLeftRight className="size-3.5" />
+          <span>Sol-ZEC</span>
+        </Link>
+
+        <Link
+          to={"/zcash-mina-bridge"}
+          className={cnm(
+            "px-2.5 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
+            `${location.pathname.startsWith("/zcash-mina-bridge") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <ArrowLeftRight className="size-3.5" />
+          <span>ZEC-Mina</span>
+        </Link>
+
+        <div className="w-px h-6 bg-black/10 mx-0.5" />
+
+        {/* DeFi */}
+        <Link
+          to={"/stablecoin"}
+          className={cnm(
+            "px-2.5 py-2 rounded-full flex items-center gap-1.5 transition-all duration-300 whitespace-nowrap",
+            `${location.pathname.startsWith("/stablecoin") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <Coins className="size-3.5" />
+          <span>Stablecoin</span>
         </Link>
       </div>
 
