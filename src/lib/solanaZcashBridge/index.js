@@ -1,5 +1,5 @@
 import { sha256 } from '@noble/hashes/sha2.js';
-import { secp256k1 } from '@noble/secp256k1';
+import * as secp256k1 from '@noble/secp256k1';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js';
 import { PublicKey, Keypair } from '@solana/web3.js';
 import bs58 from 'bs58';

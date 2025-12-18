@@ -120,6 +120,16 @@ export default function Navbar() {
           Zcash-Starknet Bridge
         </Link>
         <Link
+          to={"/solana-zcash-bridge"}
+          className={cnm(
+            "px-2.5 py-2 rounded-full flex items-center gap-1 transition-all duration-300",
+            `${location.pathname.startsWith("/solana-zcash-bridge") ? "bg-primary text-white" : ""}`
+          )}
+        >
+          <ArrowLeftRight className="size-3" />
+          Sol-ZEC
+        </Link>
+        <Link
           to={"/stablecoin"}
           className={cnm(
             "px-3 py-2 rounded-full flex items-center gap-1 transition-all duration-300",
