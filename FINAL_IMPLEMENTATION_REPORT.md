@@ -109,9 +109,9 @@ All major components have been implemented and are ready for deployment!
 
 ### 6. Documentation ✅ 100%
 **Files Created:**
-- `docs/BRIDGE_ARCHITECTURE.md` - Complete bridge design
-- `docs/STABLECOIN_DESIGN.md` - Complete stablecoin design
-- `docs/IMPLEMENTATION_STATUS.md` - Status report
+- `docs/architecture/BRIDGE_ARCHITECTURE.md` - Complete bridge design
+- `docs/architecture/STABLECOIN_DESIGN.md` - Complete stablecoin design
+- `docs/architecture/IMPLEMENTATION_STATUS.md` - Status report
 - `ENV_SETUP.md` - Environment guide
 - `ENV_CHECKLIST.md` - Quick reference
 - `ENV_VERIFICATION.md` - Verification report

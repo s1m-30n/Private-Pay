@@ -291,8 +291,7 @@ Private-Pay/
 │       └── shared/
 │           └── PrivacyNavbar.jsx       # Updated with Starknet links
 │
-└── docs/
-    └── STARKNET_INTEGRATION.md         # This file
+└── STARKNET_INTEGRATION.md             # This file (root level)
 ```
 
 ## Configuration

@@ -55,8 +55,8 @@
 - ⚠️ Needs integration with actual contracts
 
 ### 6. Documentation ✅ 100%
-- ✅ Bridge Architecture (`docs/BRIDGE_ARCHITECTURE.md`)
-- ✅ Stablecoin Design (`docs/STABLECOIN_DESIGN.md`)
+- ✅ Bridge Architecture (`docs/architecture/BRIDGE_ARCHITECTURE.md`)
+- ✅ Stablecoin Design (`docs/architecture/STABLECOIN_DESIGN.md`)
 - ✅ Environment Setup (`ENV_SETUP.md`)
 - ✅ All README files
 
@@ -129,9 +129,9 @@
 - `src/pages/StablecoinPage.jsx`
 
 ### Documentation (8 files)
-- `docs/BRIDGE_ARCHITECTURE.md`
-- `docs/STABLECOIN_DESIGN.md`
-- `docs/IMPLEMENTATION_STATUS.md`
+- `docs/architecture/BRIDGE_ARCHITECTURE.md`
+- `docs/architecture/STABLECOIN_DESIGN.md`
+- `docs/architecture/IMPLEMENTATION_STATUS.md`
 - `ENV_SETUP.md`
 - `ENV_CHECKLIST.md`
 - `ENV_VERIFICATION.md`

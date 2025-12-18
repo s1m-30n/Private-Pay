@@ -196,8 +196,7 @@ Private-Pay/
 │           ├── Cargo.toml
 │           └── src/
 │               └── lib.rs        # Anchor program
-└── docs/
-    └── HELIUS_SOLANA_ZCASH_BRIDGE.md  # This file
+└── HELIUS_SOLANA_ZCASH_BRIDGE.md      # This file (root level)
 ```
 
 ## Implementation Details

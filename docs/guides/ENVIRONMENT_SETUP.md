@@ -132,8 +132,8 @@ For Vercel deployment:
 
 ## See Also
 
-- `docs/DEPLOYMENT.md` - Deployment guide
-- `docs/SECURITY_AUDIT.md` - Security information
+- `docs/guides/DEPLOYMENT.md` - Deployment guide
+- `docs/security/SECURITY_AUDIT.md` - Security information
 - `.env.example` - Complete variable template
 
 

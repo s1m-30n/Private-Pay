@@ -102,7 +102,7 @@ Powered by ECDH + secp256k1 + BIP 0352/EIP 5564 + ROFL DarkPool Mixer
 
 ### Built With
 
-- **Blockchain**: Aztec + Arcium + Mina
+- **Blockchain**: Aztec + Arcium + Mina + Axelar + Zcash + Starknet + Osmosis + Miden + Near Protocol + Helius + Fhenix
 - **Frontend**: React + TypeScript + Vite
 - **Backend**: Node.js + Express
 - **Database**: Supabase (PostgreSQL)
@@ -137,6 +137,7 @@ Powered by ECDH + secp256k1 + BIP 0352/EIP 5564 + ROFL DarkPool Mixer
 ### Why PrivatePay Wins
 <img width="820" height="221" alt="Screenshot 2025-11-30 at 5 43 32 AM" src="https://github.com/user-attachments/assets/84f95d8e-b13a-47a1-ab44-3d4f4448c705" />
 
+---
 
 ## ⚡ Future Roadmap
 
@@ -197,6 +198,7 @@ Powered by ECDH + secp256k1 + BIP 0352/EIP 5564 + ROFL DarkPool Mixer
    └─ Transfer funds to main wallet
 ```
 
+---
 
 ## 🤖 Built with Kiro AI
 
@@ -267,3 +269,302 @@ PrivatePay was developed using **Kiro AI** - an advanced AI-powered development 
 <p align="center">
   <strong>PrivatePay: Where every transaction is invisible.</strong>
 </p>
+
+---
+
+## 🧠 System Architecture Overview
+
+Below is a concise, technical view of how the full PrivatePay system is wired across chains and infra.
+
+### High-Level Architecture
+
+```mermaid
+flowchart LR
+  subgraph User
+    UI[PrivatePay Web App (React + Vite)]
+  end
+
+  subgraph Wallets
+    APTOS[Petra / Aptos]
+    SOL[Phantom / Solflare]
+    STARK[ArgentX / Braavos]
+    OSMO[Keplr / Leap]
+    MINA[Auro]
+    NEARW[Near Wallet]
+    EVMW[EVM Wallets (Metamask, etc.)]
+  end
+
+  subgraph Chains
+    Aptos[Aptos]
+    Solana[Solana + Arcium]
+    Starknet[Starknet / Ztarknet]
+    Osmosis[Osmosis]
+    Mina[Mina]
+    Zcash[Zcash]
+    Miden[Miden]
+    Near[Near Protocol]
+    Fhenix[Fhenix]
+  end
+
+  subgraph Infra
+    Supabase[(Supabase DB)]
+    Helius[(Helius RPC)]
+    Axelar[(Axelar GMP)]
+    AztecL2[(Aztec L2)]
+    ArciumMPC[(Arcium MPC)]
+    Relayer[Relayers & ZK Provers (Zcash bridges)]
+  end
+
+  UI --> Wallets
+  Wallets --> Chains
+
+  UI --> Supabase
+  Solana --> Helius
+  Solana --> ArciumMPC
+  Starknet --> AztecL2
+  Near --> Axelar
+  Fhenix --> Axelar
+
+  Zcash <-- Relayer --> Miden
+  Zcash <-- Relayer --> Starknet
+  Zcash <-- Relayer --> Solana
+  Zcash <-- Relayer --> Osmosis
+```
+
+At the center is the **React/Vite** app, which talks to wallets, chains, Supabase, and relayer backends. Privacy is enforced through:
+
+- **Stealth meta-address registries** on Aptos, Starknet, Solana, Near, Fhenix.
+- **Bridge programs** on Solana, Starknet, Miden, Axelar, Osmosis representing sZEC / private tickets.
+- **Relayer logic** that connects Zcash with all other chains.
+
+### Stealth Meta-Address Flow (Aptos, Starknet, Solana)
+
+```mermaid
+sequenceDiagram
+  participant Sender
+  participant Recipient
+  participant Chain
+
+  Note over Recipient: 1) Generate meta address (spendPub, viewingPub)
+
+  Sender->>Recipient: Ask for meta address
+  Sender->>Sender: Generate ephemeral key (ephemeralPriv, ephemeralPub)
+  Sender->>Sender: shared = ECDH(ephemeralPriv, viewingPub)
+  Sender->>Sender: tweak = H(shared || k)
+  Sender->>Sender: stealthPub = spendPub + tweak·G
+  Sender->>Chain: Pay to stealthAddress(stealthPub)
+
+  Recipient->>Recipient: shared' = ECDH(viewingPriv, ephemeralPub)
+  Recipient->>Recipient: Derive same tweak & stealthPub
+  Recipient->>Chain: Scan for funds at stealthAddress
+  Recipient->>Recipient: stealthPriv = spendPriv + tweak
+  Recipient->>Chain: Withdraw to main wallet
+```
+
+Implemented with:
+
+- `src/lib/aptos/stealthAddress.js`
+- `src/lib/starknet/stealthAddress.js`
+- `src/lib/evm/stealthAddress.js`
+- `src/lib/solanaZcashBridge/index.js` (Solana ↔ Zcash stealth meta-addresses)
+
+---
+
+## 🧩 Integrations & Deep Dives
+
+For detailed, chain-specific architecture and flows, see these top-level docs in the repo:
+
+- `APTOS_INTEGRATION_MERMAID.md` – Aptos treasury + username links.
+- `SOLANA_HELIUS_INTEGRATION_MERMAID.md` & `HELIUS_SOLANA_ZCASH_BRIDGE.md` – Solana–Zcash bridge via Helius.
+- `STARKNET_INTEGRATION.md` & `STARKNET_ZTARKNET_INTEGRATION_MERMAID.md` – Starknet / Ztarknet wallet, sZEC, bridge, lending, swaps.
+- `OSMOSIS_INTEGRATION_MERMAID.md` – Osmosis vault and Zcash memo-based bridge.
+- `MINA_INTEGRATION_MERMAID.md` – Mina zkApp and Auro wallet.
+- `ZCASH_CORE_MERMAID.md` – Zcash RPC/lightwallet + relayer core.
+- `MIDEN_INTEGRATION_MERMAID.md` – Miden bridge VM + Circom circuits.
+- `ARCIUM_INTEGRATION_MERMAID.md` – Arcium DeFi, private swaps, and DarkPool.
+- `AZTEC_INTEGRATION_MERMAID.md` & `AZTEC_FLOWS.md` – Aztec rollup, encrypted notes, and Zcash bridge.
+- `AXELAR_INTEGRATION_MERMAID.md` & `AXELAR_INTEGRATION.md` – AxelarStealthBridge, Axelar GMP.
+
+---
+
+## 🚀 Getting Started (Developers)
+
+### 1. Prerequisites
+
+- **Node.js** ≥ 20.x (tested with Node 22.x)
+- **npm** ≥ 10.x
+- Browser wallets:
+  - Petra (Aptos)
+  - Phantom / Solflare (Solana)
+  - ArgentX / Braavos (Starknet)
+  - Keplr / Leap (Osmosis)
+  - Auro (Mina)
+
+### 2. Install Dependencies
+
+```bash
+cd Private-Pay
+npm install
+```
+
+### 3. Environment Variables (root `.env`)
+
+Each developer creates their **own** `.env` with at least:
+
+```bash
+# Core app
+VITE_BACKEND_URL=http://localhost:3400
+VITE_WEBSITE_HOST=privatepay.me
+VITE_APP_ENVIRONMENT=dev
+
+# Supabase
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Aptos
+VITE_APTOS_MODULE_ADDRESS=your_aptos_module_address
+VITE_TREASURY_WALLET_ADDRESS=your_aptos_treasury_wallet
+VITE_TREASURY_PRIVATE_KEY=your_aptos_treasury_private_key
+
+# Arcium / Solana programs
+VITE_ARCIUM_PROGRAM_ID=your_arcium_program_id
+VITE_PRIVATE_PAY_PROGRAM_ID=your_private_pay_program_id
+VITE_PRIVATE_SWAP_PROGRAM_ID=your_private_swap_program_id
+VITE_DARK_POOL_PROGRAM_ID=your_dark_pool_program_id
+VITE_ARCIUM_CLUSTER_OFFSET=0
+VITE_SOLANA_RPC_URL=https://api.devnet.solana.com
+
+# Axelar bridge
+VITE_AXELAR_BRIDGE_ADDRESS=your_axelar_bridge_address
+
+# Zcash (frontend)
+VITE_ZCASH_NETWORK=testnet
+VITE_ZCASH_RPC_URL=http://localhost:18232
+VITE_ZCASH_RPC_USER=zcashuser
+VITE_ZCASH_RPC_PASSWORD=zcashpass
+
+# Starknet configuration (Sepolia testnet)
+VITE_STARKNET_NETWORK=testnet
+VITE_STARKNET_RPC_URL=https://starknet-sepolia.public.blastapi.io
+VITE_STARKNET_STEALTH_CONTRACT=your_starknet_stealth_contract
+VITE_STARKNET_PAYMENT_MANAGER=your_starknet_payment_manager
+VITE_STARKNET_BRIDGE_CONTRACT=your_starknet_bridge_contract
+VITE_STARKNET_LENDING_CONTRACT=your_starknet_lending_contract
+VITE_STARKNET_SWAP_CONTRACT=your_starknet_swap_contract
+VITE_STARKNET_GARAGA_VERIFIER=your_starknet_garaga_verifier
+VITE_STARKNET_SZEC_TOKEN=your_starknet_szec_token
+
+# Helius / Solana–Zcash bridge
+VITE_HELIUS_API_KEY=your_helius_api_key
+VITE_SOLANA_NETWORK=devnet
+VITE_ZCASH_BRIDGE_PROGRAM_ID=your_solana_zcash_bridge_program_id
+VITE_USDC_MINT=your_usdc_mint
+
+# Osmosis / CosmosKit / WalletConnect
+VITE_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id
+
+# Relayer / backend Zcash RPC
+BRIDGE_OPERATOR_PRIVATE_KEY=your_base58_bridge_operator_private_key
+ZCASH_RPC_URL=http://localhost:18232
+ZCASH_RPC_USER=zcashuser
+ZCASH_RPC_PASSWORD=zcashpass
+ZCASH_BRIDGE_ADDRESS=your_zcash_bridge_address
+
+# Backend server
+PORT=3001
+HOST=0.0.0.0
+```
+
+For a full list and guidance, see `docs/guides/ENVIRONMENT_SETUP.md` and `docs/guides/DEPLOYMENT.md`.
+
+### 4. Run Frontend (or Full Stack)
+
+```bash
+# Frontend only
+npm run dev   # http://localhost:5173
+
+# Frontend + backend together (dev)
+npm run dev:all
+```
+
+---
+
+## 🧩 Project Structure (Key Folders)
+
+```text
+src/
+  components/
+    home/                # Dashboard cards & charts
+    aptos/               # Aptos payment UIs
+    mina-protocol/       # Mina wallet & helper components
+    osmosis/             # Osmosis wallet button, bridge UI
+    shared/              # Navbar, header, icons, dialogs
+
+  pages/
+    IndexPage.jsx        # Landing/dashboard
+    SendPage.jsx         # Aptos send flow
+    MinaPage.jsx         # Mina integration
+    ZcashPage.jsx        # Zcash wallet
+    ZcashMinaBridgePage.jsx
+    StarknetPage.jsx
+    ZcashStarknetBridgePage.jsx
+    ZtarknetLendingPage.jsx
+    ZtarknetSwapPage.jsx
+    OsmosisPage.jsx
+    SolanaZcashBridgePage.jsx
+
+  providers/
+    RootProvider.jsx     # Composes all context providers
+    AptosProvider.jsx
+    SolanaProvider.jsx   # Helius-aware Solana provider
+    StarknetProvider.jsx
+    ZcashProvider.jsx
+    CosmosProvider.jsx
+
+  lib/
+    aptos/               # Stealth + Aptos client
+    starknet/            # Stealth, bridge, relay helpers
+    solanaZcashBridge/   # Solana ↔ Zcash client + utils
+    helius/              # Helius client wrappers
+    zcash/               # Zcash wallet + RPC helpers
+    arcium/              # Arcium/DeFi helpers
+    axelar/              # Axelar GMP & tokens
+
+  relayer/
+    config.js            # Relayer config
+    index.js             # Main relayer orchestration
+    zcash-client.js      # Zcash RPC client
+    miden-client*.js     # Miden client abstractions
+    zk-proofs.js         # ZK proof helpers
+    ...
+
+solana/
+  programs/private_pay   # Arcium/DeFi Solana programs
+  programs/zcash_bridge  # Solana ↔ Zcash bridge program
+
+src/miden/
+  bridge.asm             # Miden bridge logic in assembly
+
+src/circuits/
+  bridge.circom          # Circom circuit for bridge proofs
+```
+
+---
+
+## 🧪 Testing
+
+- **Frontend e2e (bridges & stablecoin)**
+
+  ```bash
+  npm run test:e2e
+  npm run test:e2e:bridge
+  npm run test:e2e:stablecoin
+  ```
+
+- **Relayer simulation (Zcash–Miden bridge)**
+
+  ```bash
+  npm run test:relayer
+  ```
+
+See `RELAYER_README.md` for relayer testing details, and `docs/architecture/SYSTEM_FLOWS.md` for end‑to‑end flow diagrams.

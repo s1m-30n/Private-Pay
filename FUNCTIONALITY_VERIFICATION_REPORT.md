@@ -47,7 +47,7 @@
 **Status**: ✅ **FULLY IMPLEMENTED**
 
 **Implementation Details**:
-- ✅ **Bridge Architecture** (`docs/BRIDGE_ARCHITECTURE.md`)
+- ✅ **Bridge Architecture** (`docs/architecture/BRIDGE_ARCHITECTURE.md`)
   - Complete design documentation
   - Privacy-preserving proof system
   - Cross-chain state synchronization
@@ -147,7 +147,7 @@
   - Bridge operator service structure (`backend/services/bridgeOperator.js`)
   - Operator address management (`ZcashBridge.nr` lines 23-24, 185-193)
   - Multi-party validation points identified
-  - Integration points documented in `docs/BRIDGE_ARCHITECTURE.md`
+  - Integration points documented in `docs/architecture/BRIDGE_ARCHITECTURE.md`
 
 **Note**: Structure complete, ready for MPC provider or EigenLayer AVS integration when infrastructure is available.
 
@@ -239,7 +239,7 @@
 
 #### ✅ **Private Yield Generation**
 - ✅ **Structure Implemented**:
-  - Collateral pool design (`docs/STABLECOIN_DESIGN.md` lines 28-32)
+  - Collateral pool design (`docs/architecture/STABLECOIN_DESIGN.md` lines 28-32)
   - Yield distribution mechanism (documented)
   - Private yield calculations (structure ready)
   - Integration points identified in `PZUSD.nr`
@@ -280,7 +280,7 @@
 - ✅ `backend/services/oracle.js` - Complete oracle service
 - ✅ `src/components/stablecoin/Stablecoin.jsx` - Complete UI
 - ✅ `src/pages/StablecoinPage.jsx` - Page integration
-- ✅ `docs/STABLECOIN_DESIGN.md` - Complete design documentation
+- ✅ `docs/architecture/STABLECOIN_DESIGN.md` - Complete design documentation
 
 **Completion**: **100%** ✅
 
