@@ -99,17 +99,17 @@ export default function OsmosisPage() {
                   >
                     {showBalance ? <EyeOff className="w-5 h-5 text-gray-600" /> : <Eye className="w-5 h-5 text-gray-600" />}
                   </button>
-                  <button
-                    onClick={togglePrivacy}
+                    <button 
+                        onClick={togglePrivacy}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${
-                      privacyMode 
+                            privacyMode 
                         ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-transparent shadow-md' 
                         : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50'
-                    }`}
-                  >
+                        }`}
+                    >
                     <Shield className="w-4 h-4" />
                     <span className="text-sm font-medium">{privacyMode ? 'Privacy ON' : 'Privacy OFF'}</span>
-                  </button>
+                    </button>
                 </div>
               </div>
             </CardBody>
@@ -130,7 +130,7 @@ export default function OsmosisPage() {
                   tabContent: "group-data-[selected=true]:text-blue-600 group-data-[selected=true]:font-semibold",
                   cursor: "bg-gradient-to-r from-blue-600 to-indigo-600",
                 }}
-              >
+                >
                 <Tab
                   key="overview"
                   title={
@@ -149,7 +149,7 @@ export default function OsmosisPage() {
                           Cross-Chain Bridge
                         </h3>
                         <BridgeComponent />
-                      </div>
+                        </div>
 
                       {/* Privacy Payment */}
                       <div>
@@ -158,7 +158,7 @@ export default function OsmosisPage() {
                           Private Payments
                         </h3>
                         <PrivacyPayment />
-                      </div>
+                        </div>
                     </div>
                   </div>
                 </Tab>
@@ -173,8 +173,8 @@ export default function OsmosisPage() {
                   }
                 >
                   <div className="p-6">
-                    <BridgeComponent />
-                  </div>
+                     <BridgeComponent />
+                </div>
                 </Tab>
 
                 <Tab
@@ -187,7 +187,7 @@ export default function OsmosisPage() {
                   }
                 >
                   <div className="p-6">
-                    <PrivacyPayment />
+                     <PrivacyPayment />
                   </div>
                 </Tab>
               </Tabs>

@@ -414,16 +414,16 @@ export default function DarkPoolPage() {
             </Button>
             <div className="flex items-center gap-3">
               <img src="/assets/arcium.png" alt="Arcium" className="w-8 h-8 rounded-full" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                  Dark Pool
-                  <Chip size="sm" color="primary" variant="flat">
-                    Private Order Book
-                  </Chip>
-                </h1>
-                <p className="text-gray-500 text-sm">
-                  Trade with hidden orders, protected from front-running
-                </p>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                Dark Pool
+                <Chip size="sm" color="primary" variant="flat">
+                  Private Order Book
+                </Chip>
+              </h1>
+              <p className="text-gray-500 text-sm">
+                Trade with hidden orders, protected from front-running
+              </p>
               </div>
             </div>
           </div>
@@ -473,8 +473,8 @@ export default function DarkPoolPage() {
                       </div>
                     }
                   >
-                    {pair.base}/{pair.quote}
-                  </SelectItem>
+                  {pair.base}/{pair.quote}
+                </SelectItem>
                 );
               })}
             </Select>
@@ -577,9 +577,9 @@ export default function DarkPoolPage() {
                           alt={currentPair?.quote} 
                           className="w-4 h-4 rounded-full" 
                         />
-                        <span className="text-gray-500 text-sm">
-                          {currentPair?.quote}
-                        </span>
+                      <span className="text-gray-500 text-sm">
+                        {currentPair?.quote}
+                      </span>
                       </div>
                     }
                   />
@@ -604,9 +604,9 @@ export default function DarkPoolPage() {
                         alt={currentPair?.base} 
                         className="w-4 h-4 rounded-full" 
                       />
-                      <span className="text-gray-500 text-sm">
-                        {currentPair?.base}
-                      </span>
+                    <span className="text-gray-500 text-sm">
+                      {currentPair?.base}
+                    </span>
                     </div>
                   }
                 />
@@ -617,9 +617,9 @@ export default function DarkPoolPage() {
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-600">Total</span>
                   <div className="flex items-center gap-1">
-                    <span className="text-gray-900 font-mono">
-                      {orderSize && orderPrice
-                        ? (parseFloat(orderSize) * parseFloat(orderPrice)).toFixed(2)
+                  <span className="text-gray-900 font-mono">
+                    {orderSize && orderPrice
+                      ? (parseFloat(orderSize) * parseFloat(orderPrice)).toFixed(2)
                         : "0.00"}
                     </span>
                     <img 
@@ -628,8 +628,8 @@ export default function DarkPoolPage() {
                       className="w-4 h-4 rounded-full" 
                     />
                     <span className="text-gray-900 font-mono">
-                      {currentPair?.quote}
-                    </span>
+                    {currentPair?.quote}
+                  </span>
                   </div>
                 </div>
               </div>

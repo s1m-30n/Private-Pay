@@ -254,3 +254,26 @@ button.wallet-adapter-button-trigger:hover:not([disabled]) {
   background-color: #0d08e3 !important;
   background: #0d08e3 !important;
 }
+
+/* Fix Chip text display - prevent text truncation */
+[data-slot="base"] button[class*="chip"],
+button[class*="chip"],
+.chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: auto !important;
+  min-height: 24px !important;
+  padding: 4px 12px !important;
+  line-height: 1.4 !important;
+  overflow: visible !important;
+}
+
+[data-slot="base"] button[class*="chip"] span,
+button[class*="chip"] span,
+.chip span {
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}

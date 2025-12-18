@@ -32,7 +32,6 @@ import {
   BridgeDirection,
   BRIDGE_CONSTANTS,
 } from "../lib/solanaZcashBridge/index";
-import { Icons } from "../components/shared/Icons";
 import toast from "react-hot-toast";
 import { 
   ArrowDown, 
@@ -281,36 +280,26 @@ export default function SolanaZcashBridgePage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-start justify-center py-20 px-4 md:px-10 bg-gradient-to-br from-white to-amber-50/30">
-      <div className="w-full max-w-4xl">
-        <div className="flex items-center justify-between mb-8">
+    <div className="flex flex-col items-center w-full min-h-screen py-12 px-4 pb-24">
+      <div className="w-full max-w-6xl">
+        <div className="flex flex-col items-center gap-6 mb-8">
           <div className="flex items-center gap-4">
-            <Button
-              isIconOnly
-              variant="light"
-              className="text-gray-600"
-              onClick={() => navigate("/")}
-            >
-              <Icons.back className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <span className="bg-gradient-to-r from-purple-600 to-amber-500 bg-clip-text text-transparent">
-                  Solana ↔ Zcash Bridge
-                </span>
-                <Chip size="sm" color="warning" variant="flat">
-                  Privacy
-                </Chip>
-              </h1>
-              <p className="text-gray-500 text-sm mt-1">
-                Cross-chain privacy bridge powered by Helius
-              </p>
-            </div>
+            <img src="/assets/solana_logo.png" alt="Solana" className="w-12 h-12 rounded-full" />
+            <ArrowLeftRight className="w-8 h-8 text-gray-400" />
+            <img src="/assets/zcash_logo.png" alt="Zcash" className="w-12 h-12 rounded-full" />
           </div>
-
+          <div className="text-center">
+            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-600 to-amber-500 bg-clip-text text-transparent mb-2 px-4 text-center">
+              Solana ↔ Zcash Bridge
+            </h1>
+            <p className="text-gray-600 max-w-lg px-4 text-center text-sm sm:text-base">
+              Cross-chain privacy bridge powered by Helius. Transfer between Solana and Zcash with zero-knowledge privacy.
+            </p>
+            </div>
           <div className="flex items-center gap-3">
+
             {connected && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 rounded-full border border-purple-200">
+              <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 rounded-full border border-purple-200">
                 <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
                 <span className="text-purple-700 text-sm font-medium">
                   {bridgeClient ? "Bridge Ready" : "Connecting..."}
@@ -324,61 +313,82 @@ export default function SolanaZcashBridgePage() {
           </div>
         </div>
 
-        <Card className="bg-white border border-gray-200 shadow-sm mb-6">
-          <CardBody className="flex flex-row items-center justify-between py-3 px-4">
-            <div className="flex items-center gap-4">
-              <Shield className="w-5 h-5 text-purple-600" />
-              <span className="text-gray-900 font-medium">
-                Privacy-Preserving Bridge with Helius Monitoring
-              </span>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-gray-500 text-sm">
-                <Lock className="w-4 h-4" />
-                <span>ZK Proofs</span>
+        <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 shadow-sm mb-6">
+          <CardBody className="p-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-indigo-400 flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-6 h-6 text-white" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-gray-900 font-bold text-sm sm:text-base">Privacy-Preserving Bridge</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm">Powered by Helius Monitoring</p>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-gray-500 text-sm">
-                <Zap className="w-4 h-4" />
-                <span>Priority Fees</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-500 text-sm">
-                <Shield className="w-4 h-4" />
-                <span>Shielded Transfers</span>
+              <div className="flex items-center gap-3 sm:gap-6 flex-wrap justify-center">
+                <div className="flex items-center gap-2 text-gray-700">
+                  <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm font-medium whitespace-nowrap">ZK Proofs</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-700">
+                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm font-medium whitespace-nowrap">Priority Fees</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-700">
+                  <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm font-medium whitespace-nowrap">Shielded</span>
+                </div>
               </div>
             </div>
           </CardBody>
         </Card>
 
         {bridgeStats && (
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-              <CardBody className="py-4">
-                <p className="text-purple-600 text-xs font-medium">Total Deposits</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 shadow-sm">
+              <CardBody className="py-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <ArrowDown className="w-4 h-4 text-purple-600" />
+                  <p className="text-purple-600 text-xs font-semibold">Total Deposits</p>
+                </div>
                 <p className="text-2xl font-bold text-purple-900">
-                  {formatSolAmount(bridgeStats.totalDeposits)} SOL
+                  {formatSolAmount(bridgeStats.totalDeposits)} <span className="text-sm text-purple-600">SOL</span>
                 </p>
               </CardBody>
             </Card>
-            <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
-              <CardBody className="py-4">
-                <p className="text-amber-600 text-xs font-medium">Total Withdrawals</p>
+            <Card className="bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200 shadow-sm">
+              <CardBody className="py-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <ArrowDown className="w-4 h-4 text-amber-600 rotate-180" />
+                  <p className="text-amber-600 text-xs font-semibold">Total Withdrawals</p>
+                </div>
                 <p className="text-2xl font-bold text-amber-900">
-                  {formatSolAmount(bridgeStats.totalWithdrawals)} SOL
+                  {formatSolAmount(bridgeStats.totalWithdrawals)} <span className="text-sm text-amber-600">SOL</span>
                 </p>
               </CardBody>
             </Card>
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-              <CardBody className="py-4">
-                <p className="text-blue-600 text-xs font-medium">Bridge Fee</p>
-                <p className="text-2xl font-bold text-blue-900">
+            <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 shadow-sm">
+              <CardBody className="py-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-4 h-4 text-purple-600" />
+                  <p className="text-purple-600 text-xs font-semibold">Bridge Fee</p>
+                </div>
+                <p className="text-2xl font-bold text-purple-900">
                   {bridgeStats.feeBps / 100}%
                 </p>
               </CardBody>
             </Card>
-            <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
-              <CardBody className="py-4">
-                <p className="text-emerald-600 text-xs font-medium">Status</p>
-                <p className="text-2xl font-bold text-emerald-900">
+            <Card className={`bg-gradient-to-br ${bridgeStats.isPaused ? 'from-red-50 to-rose-50 border-red-200' : 'from-purple-50 to-indigo-50 border-purple-200'} border shadow-sm`}>
+              <CardBody className="py-5">
+                <div className="flex items-center gap-2 mb-2">
+                  {bridgeStats.isPaused ? (
+                    <XCircle className="w-4 h-4 text-red-600" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4 text-purple-600" />
+                  )}
+                  <p className={`text-xs font-semibold ${bridgeStats.isPaused ? 'text-red-600' : 'text-purple-600'}`}>Status</p>
+                </div>
+                <p className={`text-2xl font-bold ${bridgeStats.isPaused ? 'text-red-900' : 'text-purple-900'}`}>
                   {bridgeStats.isPaused ? "Paused" : "Active"}
                 </p>
               </CardBody>
@@ -396,28 +406,32 @@ export default function SolanaZcashBridgePage() {
                   variant="underlined"
                   color="primary"
                   classNames={{
-                    tabList: "gap-6",
-                    cursor: "w-full bg-purple-500",
-                    tab: "max-w-fit px-0 h-12",
-                    tabContent: "group-data-[selected=true]:text-purple-600 font-medium"
+                    tabList: "gap-3 sm:gap-6 w-full relative rounded-none p-0 border-b border-divider px-3 sm:px-6 overflow-x-auto",
+                    cursor: "bg-gradient-to-r from-purple-600 to-indigo-600",
+                    tab: "max-w-fit px-0 h-12 flex-shrink-0",
+                    tabContent: "group-data-[selected=true]:text-purple-600 group-data-[selected=true]:font-semibold whitespace-nowrap"
                   }}
                 >
                   <Tab
                     key="deposit"
                     title={
                       <div className="flex items-center gap-2">
-                        <ArrowDown className="w-4 h-4" />
-                        <span>Deposit (SOL → ZEC)</span>
+                        <ArrowDown className="w-4 h-4 flex-shrink-0" />
+                        <span className="whitespace-nowrap">Deposit</span>
+                        <span className="hidden sm:inline">(SOL → ZEC)</span>
                       </div>
                     }
                   >
                     <div className="pt-6 space-y-6">
-                      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-100">
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-gray-600 text-sm">From Solana</span>
+                      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200">
+                        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <img src="/assets/solana_logo.png" alt="Solana" className="w-6 h-6 rounded-full flex-shrink-0" />
+                            <span className="text-gray-700 text-sm font-semibold whitespace-nowrap">From Solana</span>
+                          </div>
                           {priorityFee && (
                             <Tooltip content="Estimated priority fee for fast confirmation">
-                              <Chip size="sm" color="secondary" variant="flat">
+                              <Chip size="sm" className="bg-purple-100 text-purple-700 border-purple-200 whitespace-nowrap" variant="flat">
                                 ~{priorityFee.medium / 1000000} SOL fee
                               </Chip>
                             </Tooltip>
@@ -431,32 +445,37 @@ export default function SolanaZcashBridgePage() {
                           size="lg"
                           classNames={{
                             input: "text-2xl font-bold",
-                            inputWrapper: "bg-white border-gray-200",
+                            inputWrapper: "h-14 bg-white border-gray-200",
                           }}
                           endContent={
                             <div className="flex items-center gap-2">
-                              <span className="text-gray-500 font-medium">SOL</span>
+                              <img src="/assets/solana_logo.png" alt="SOL" className="w-5 h-5 rounded-full" />
+                              <span className="text-gray-600 font-semibold">SOL</span>
                             </div>
                           }
                         />
-                        <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-                          <span>Min: {BRIDGE_CONSTANTS.MIN_DEPOSIT_SOL} SOL</span>
-                          <span>Max: {BRIDGE_CONSTANTS.MAX_DEPOSIT_SOL} SOL</span>
+                        <div className="flex items-center justify-between mt-2 text-xs text-gray-500 flex-wrap gap-1">
+                          <span className="whitespace-nowrap">Min: {BRIDGE_CONSTANTS.MIN_DEPOSIT_SOL} SOL</span>
+                          <span className="whitespace-nowrap">Max: {BRIDGE_CONSTANTS.MAX_DEPOSIT_SOL} SOL</span>
                         </div>
                       </div>
 
-                      <div className="flex justify-center">
-                        <div className="p-3 bg-purple-100 rounded-full">
-                          <ArrowDown className="w-5 h-5 text-purple-600" />
+                      <div className="flex justify-center -my-2 z-10 relative">
+                        <div className="bg-white p-3 rounded-full border-2 border-purple-300 shadow-lg flex items-center justify-center">
+                          <ArrowDown className="w-6 h-6 text-purple-600" />
                         </div>
                       </div>
 
-                      <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-4 border border-amber-100">
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-gray-600 text-sm">To Zcash (Shielded)</span>
-                          <Chip size="sm" color="warning" variant="flat">
-                            <Shield className="w-3 h-3 mr-1" />
-                            Private
+                      <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-6 border border-amber-200">
+                        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <img src="/assets/zcash_logo.png" alt="Zcash" className="w-6 h-6 rounded-full flex-shrink-0" />
+                            <span className="text-gray-700 text-sm font-semibold whitespace-nowrap">To Zcash</span>
+                            <span className="hidden sm:inline text-gray-700 text-sm font-semibold">(Shielded)</span>
+                          </div>
+                          <Chip size="sm" color="warning" variant="flat" className="flex-shrink-0 h-auto py-1.5">
+                            <Shield className="w-3 h-3 mr-1 flex-shrink-0" />
+                            <span className="whitespace-nowrap leading-tight">Private</span>
                           </Chip>
                         </div>
                         <Input
@@ -478,30 +497,30 @@ export default function SolanaZcashBridgePage() {
                       </div>
 
                       <Button
-                        color="primary"
                         size="lg"
-                        className="w-full font-bold bg-gradient-to-r from-purple-600 to-indigo-600"
+                        className="w-full h-12 font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg hover:shadow-xl transition-all"
                         onClick={handleDeposit}
                         isLoading={isDepositing}
                         isDisabled={!connected || !depositAmount || !isValidZcashAddress(zcashDestAddress)}
+                        startContent={!isDepositing && <ArrowDown className="w-5 h-5" />}
                       >
                         {!connected ? "Connect Wallet" : "Initiate Deposit"}
                       </Button>
 
                       {depositResult && (
-                        <Card className="bg-emerald-50 border-emerald-200">
+                        <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
                           <CardBody className="py-3">
-                            <div className="flex items-center gap-2 text-emerald-700">
+                            <div className="flex items-center gap-2 text-purple-700">
                               <CheckCircle2 className="w-5 h-5" />
                               <span className="font-medium">Deposit Initiated</span>
                             </div>
-                            <div className="mt-2 text-sm text-emerald-600">
+                            <div className="mt-2 text-sm text-purple-600">
                               <p>Ticket ID: #{depositResult.ticketId}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className="font-mono text-xs truncate">
+                              <div className="flex items-center gap-2 mt-1 min-w-0">
+                                <span className="font-mono text-xs truncate flex-1 min-w-0">
                                   {depositResult.signature}
                                 </span>
-                                <button onClick={() => handleCopy(depositResult.signature)}>
+                                <button onClick={() => handleCopy(depositResult.signature)} className="flex-shrink-0">
                                   {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                                 </button>
                               </div>
@@ -516,18 +535,24 @@ export default function SolanaZcashBridgePage() {
                     key="withdraw"
                     title={
                       <div className="flex items-center gap-2">
-                        <ArrowDown className="w-4 h-4 rotate-180" />
-                        <span>Withdraw (ZEC → SOL)</span>
+                        <ArrowDown className="w-4 h-4 rotate-180 flex-shrink-0" />
+                        <span className="whitespace-nowrap">Withdraw</span>
+                        <span className="hidden sm:inline">(ZEC → SOL)</span>
                       </div>
                     }
                   >
                     <div className="pt-6 space-y-6">
-                      <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-4 border border-amber-100">
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-gray-600 text-sm">From Zcash</span>
-                          <Chip size="sm" color="warning" variant="flat">
-                            <Shield className="w-3 h-3 mr-1" />
-                            Shielded Proof
+                      <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-6 border border-amber-200">
+                        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <img src="/assets/zcash_logo.png" alt="Zcash" className="w-6 h-6 rounded-full flex-shrink-0" />
+                            <span className="text-gray-700 text-sm font-semibold whitespace-nowrap">From Zcash</span>
+                          </div>
+                          <Chip size="sm" color="warning" variant="flat" className="flex-shrink-0 h-auto py-1.5">
+                            <Shield className="w-3 h-3 mr-1 flex-shrink-0" />
+                            <span className="whitespace-nowrap leading-tight">
+                              <span className="hidden sm:inline">Shielded </span>Proof
+                            </span>
                           </Chip>
                         </div>
                         <Input
@@ -538,11 +563,12 @@ export default function SolanaZcashBridgePage() {
                           size="lg"
                           classNames={{
                             input: "text-2xl font-bold",
-                            inputWrapper: "bg-white border-gray-200",
+                            inputWrapper: "h-14 bg-white border-gray-200",
                           }}
                           endContent={
                             <div className="flex items-center gap-2">
-                              <span className="text-gray-500 font-medium">ZEC</span>
+                              <img src="/assets/zcash_logo.png" alt="ZEC" className="w-5 h-5 rounded-full" />
+                              <span className="text-gray-600 font-semibold">ZEC</span>
                             </div>
                           }
                         />
@@ -560,22 +586,23 @@ export default function SolanaZcashBridgePage() {
                         }}
                       />
 
-                      <div className="flex justify-center">
-                        <div className="p-3 bg-amber-100 rounded-full">
-                          <ArrowDown className="w-5 h-5 text-amber-600 rotate-180" />
+                      <div className="flex justify-center -my-2 z-10 relative">
+                        <div className="bg-white p-3 rounded-full border-2 border-amber-300 shadow-lg flex items-center justify-center">
+                          <ArrowDown className="w-6 h-6 text-amber-600 rotate-180" />
                         </div>
                       </div>
 
-                      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-100">
+                      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200">
                         <div className="flex items-center justify-between mb-4">
-                          <span className="text-gray-600 text-sm">To Solana</span>
-                        </div>
-                        <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-200">
-                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                            <Zap className="w-4 h-4 text-purple-600" />
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <img src="/assets/solana_logo.png" alt="Solana" className="w-6 h-6 rounded-full flex-shrink-0" />
+                            <span className="text-gray-700 text-sm font-semibold whitespace-nowrap">To Solana</span>
                           </div>
+                        </div>
+                        <div className="flex items-center gap-3 bg-white p-4 rounded-lg border border-gray-200">
+                          <img src="/assets/solana_logo.png" alt="Solana" className="w-10 h-10 rounded-full" />
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900">Your Wallet</p>
+                            <p className="text-sm font-semibold text-gray-900">Your Wallet</p>
                             <p className="text-xs text-gray-500 font-mono truncate">
                               {connected ? publicKey?.toBase58() : "Not connected"}
                             </p>
@@ -584,24 +611,24 @@ export default function SolanaZcashBridgePage() {
                       </div>
 
                       <Button
-                        color="warning"
                         size="lg"
-                        className="w-full font-bold"
+                        className="w-full h-12 font-bold bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-lg hover:shadow-xl transition-all"
                         onClick={handleWithdraw}
                         isLoading={isWithdrawing}
                         isDisabled={!connected || !withdrawAmount || !zcashTxId}
+                        startContent={!isWithdrawing && <ArrowDown className="w-5 h-5 rotate-180" />}
                       >
                         {!connected ? "Connect Wallet" : "Initiate Withdrawal"}
                       </Button>
 
                       {withdrawResult && (
-                        <Card className="bg-emerald-50 border-emerald-200">
+                        <Card className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200">
                           <CardBody className="py-3">
-                            <div className="flex items-center gap-2 text-emerald-700">
+                            <div className="flex items-center gap-2 text-amber-700">
                               <CheckCircle2 className="w-5 h-5" />
                               <span className="font-medium">Withdrawal Initiated</span>
                             </div>
-                            <div className="mt-2 text-sm text-emerald-600">
+                            <div className="mt-2 text-sm text-amber-600">
                               <p>Ticket ID: #{withdrawResult.ticketId}</p>
                             </div>
                           </CardBody>
@@ -640,10 +667,9 @@ export default function SolanaZcashBridgePage() {
                         </p>
 
                         <Button
-                          color="default"
                           variant="flat"
                           size="lg"
-                          className="w-full font-medium"
+                          className="w-full font-medium bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200"
                           onClick={handleGenerateStealthAddress}
                           isDisabled={!connected}
                         >
@@ -655,23 +681,23 @@ export default function SolanaZcashBridgePage() {
                       {stealthMetaAddress && (
                         <Card className="bg-purple-50 border-purple-200">
                           <CardBody className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <h4 className="font-bold text-purple-900">Your Meta-Address</h4>
+                            <div className="flex items-center justify-between gap-2 flex-wrap">
+                              <h4 className="font-bold text-purple-900 text-sm sm:text-base">Your Meta-Address</h4>
                               <Button
                                 size="sm"
                                 variant="flat"
-                                color="secondary"
+                                className="text-purple-700 hover:bg-purple-50 flex-shrink-0"
                                 onClick={() => setShowPrivateKeys(!showPrivateKeys)}
                               >
                                 {showPrivateKeys ? (
                                   <>
                                     <EyeOff className="w-4 h-4 mr-1" />
-                                    Hide Keys
+                                    <span className="hidden sm:inline">Hide </span>Keys
                                   </>
                                 ) : (
                                   <>
                                     <Eye className="w-4 h-4 mr-1" />
-                                    Show Keys
+                                    <span className="hidden sm:inline">Show </span>Keys
                                   </>
                                 )}
                               </Button>
@@ -682,11 +708,11 @@ export default function SolanaZcashBridgePage() {
                                 <label className="text-xs text-purple-600 font-medium">
                                   Meta-Address (share this)
                                 </label>
-                                <div className="flex items-center gap-2 bg-white p-2 rounded-lg border border-purple-100">
-                                  <code className="text-xs truncate flex-1 text-gray-700">
+                                <div className="flex items-center gap-2 bg-white p-2 rounded-lg border border-purple-100 min-w-0">
+                                  <code className="text-xs truncate flex-1 text-gray-700 min-w-0">
                                     {stealthMetaAddress.metaAddress}
                                   </code>
-                                  <button onClick={() => handleCopy(stealthMetaAddress.metaAddress)}>
+                                  <button onClick={() => handleCopy(stealthMetaAddress.metaAddress)} className="flex-shrink-0">
                                     <Copy className="w-4 h-4 text-purple-600" />
                                   </button>
                                 </div>
@@ -698,11 +724,11 @@ export default function SolanaZcashBridgePage() {
                                     <label className="text-xs text-red-600 font-medium">
                                       Spending Private Key (KEEP SECRET)
                                     </label>
-                                    <div className="flex items-center gap-2 bg-red-50 p-2 rounded-lg border border-red-200">
-                                      <code className="text-xs truncate flex-1 text-gray-700">
+                                    <div className="flex items-center gap-2 bg-red-50 p-2 rounded-lg border border-red-200 min-w-0">
+                                      <code className="text-xs truncate flex-1 text-gray-700 min-w-0">
                                         {stealthMetaAddress.spendingPrivateKey}
                                       </code>
-                                      <button onClick={() => handleCopy(stealthMetaAddress.spendingPrivateKey)}>
+                                      <button onClick={() => handleCopy(stealthMetaAddress.spendingPrivateKey)} className="flex-shrink-0">
                                         <Copy className="w-4 h-4 text-red-600" />
                                       </button>
                                     </div>
@@ -711,11 +737,11 @@ export default function SolanaZcashBridgePage() {
                                     <label className="text-xs text-amber-600 font-medium">
                                       Viewing Private Key (for scanning)
                                     </label>
-                                    <div className="flex items-center gap-2 bg-amber-50 p-2 rounded-lg border border-amber-200">
-                                      <code className="text-xs truncate flex-1 text-gray-700">
+                                    <div className="flex items-center gap-2 bg-amber-50 p-2 rounded-lg border border-amber-200 min-w-0">
+                                      <code className="text-xs truncate flex-1 text-gray-700 min-w-0">
                                         {stealthMetaAddress.viewingPrivateKey}
                                       </code>
-                                      <button onClick={() => handleCopy(stealthMetaAddress.viewingPrivateKey)}>
+                                      <button onClick={() => handleCopy(stealthMetaAddress.viewingPrivateKey)} className="flex-shrink-0">
                                         <Copy className="w-4 h-4 text-amber-600" />
                                       </button>
                                     </div>
@@ -725,8 +751,7 @@ export default function SolanaZcashBridgePage() {
                             </div>
 
                             <Button
-                              color="secondary"
-                              className="w-full"
+                              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold hover:from-purple-500 hover:to-indigo-500"
                               onClick={handleRegisterStealthAddress}
                               isLoading={isRegistering}
                             >
@@ -761,29 +786,29 @@ export default function SolanaZcashBridgePage() {
                         key={idx}
                         className="p-3 bg-gray-50 rounded-lg border border-gray-100"
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-between mb-2 gap-2 min-w-0">
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
                             {ticket.type === "deposit" ? (
-                              <ArrowDown className="w-4 h-4 text-purple-600" />
+                              <ArrowDown className="w-4 h-4 text-purple-600 flex-shrink-0" />
                             ) : (
-                              <ArrowDown className="w-4 h-4 text-amber-600 rotate-180" />
+                              <ArrowDown className="w-4 h-4 text-amber-600 rotate-180 flex-shrink-0" />
                             )}
-                            <span className="font-medium text-sm">
+                            <span className="font-medium text-sm truncate">
                               {ticket.type === "deposit" ? "Deposit" : "Withdrawal"} #{ticket.ticketId}
                             </span>
                           </div>
-                          <Chip size="sm" color={getStatusColor(ticket.status)} variant="flat">
+                          <Chip size="sm" color={getStatusColor(ticket.status)} variant="flat" className="flex-shrink-0">
                             {getStatusIcon(ticket.status)}
-                            <span className="ml-1">{ticket.status}</span>
+                            <span className="ml-1 whitespace-nowrap">{ticket.status}</span>
                           </Chip>
                         </div>
-                        <div className="flex items-center justify-between text-xs text-gray-500">
-                          <span>
+                        <div className="flex items-center justify-between text-xs text-gray-500 gap-2">
+                          <span className="whitespace-nowrap">
                             {formatSolAmount(ticket.amount)} {ticket.type === "deposit" ? "SOL" : "ZEC"}
                           </span>
                           <button 
                             onClick={() => refreshTicketStatus(ticket)}
-                            className="p-1 hover:bg-gray-200 rounded"
+                            className="p-1 hover:bg-gray-200 rounded flex-shrink-0"
                           >
                             <RefreshCw className="w-3 h-3" />
                           </button>
@@ -795,39 +820,42 @@ export default function SolanaZcashBridgePage() {
               </CardBody>
             </Card>
 
-            <Card className="bg-gradient-to-br from-slate-50 to-gray-50 border border-gray-200">
+            <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200">
               <CardBody className="p-4">
-                <h3 className="font-bold text-gray-900 mb-4">How It Works</h3>
+                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-purple-600" />
+                  How It Works
+                </h3>
                 <div className="space-y-3 text-sm text-gray-600">
                   <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-xs">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-indigo-400 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                       1
                     </div>
-                    <p>Deposit SOL to the bridge and specify a Zcash shielded address</p>
+                    <p className="text-sm text-gray-700 min-w-0 break-words">Deposit SOL to the bridge and specify a Zcash shielded address</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-xs">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-indigo-400 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                       2
                     </div>
-                    <p>Bridge operator monitors via Helius webhooks and releases ZEC</p>
+                    <p className="text-sm text-gray-700 min-w-0 break-words">Bridge operator monitors via Helius webhooks and releases ZEC</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-xs">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-indigo-400 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                       3
                     </div>
-                    <p>For withdrawals, send ZEC to bridge and provide proof to claim SOL</p>
+                    <p className="text-sm text-gray-700 min-w-0 break-words">For withdrawals, send ZEC to bridge and provide proof to claim SOL</p>
                   </div>
                 </div>
               </CardBody>
             </Card>
 
-            <Card className="bg-amber-50 border border-amber-200">
+            <Card className="bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200">
               <CardBody className="p-4">
                 <div className="flex items-center gap-2 text-amber-700 mb-2">
-                  <AlertCircle className="w-4 h-4" />
+                  <Shield className="w-5 h-5" />
                   <span className="font-bold text-sm">Privacy Notice</span>
                 </div>
-                <p className="text-xs text-amber-600">
+                <p className="text-xs text-amber-700">
                   Zcash shielded transactions provide strong privacy. The bridge 
                   operator cannot see shielded balances or transaction details.
                   Only commitments and nullifiers are verified.

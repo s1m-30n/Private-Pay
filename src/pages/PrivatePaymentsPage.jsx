@@ -301,14 +301,14 @@ export default function PrivatePaymentsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <Button
+              <Button
               isIconOnly
               variant="light"
               className="text-gray-600"
-              onClick={() => navigate("/arcium")}
-            >
+                onClick={() => navigate("/arcium")}
+              >
               <Icons.back className="w-5 h-5" />
-            </Button>
+              </Button>
             <div className="flex items-center gap-3">
               <img src="/assets/arcium.png" alt="Arcium" className="w-8 h-8 rounded-full" />
               <div>
@@ -344,8 +344,8 @@ export default function PrivatePaymentsPage() {
               />
             </CardBody>
           </Card>
-        ) : (
-          <>
+            ) : (
+              <>
             {/* Balance Card */}
             <Card className="bg-gradient-to-br from-primary/10 to-indigo-50/50 border border-primary/20 shadow-sm rounded-3xl">
               <CardBody className="p-6">
@@ -443,13 +443,13 @@ export default function PrivatePaymentsPage() {
                       </Card>
 
                       <div className="flex gap-3">
-                        <Button
+                <Button 
                           color="default"
                           variant="bordered"
                           className="flex-1"
-                          onClick={handleInitBalance}
-                          isLoading={loading}
-                          isDisabled={!connected}
+                  onClick={handleInitBalance} 
+                  isLoading={loading} 
+                  isDisabled={!connected}
                         >
                           Init Account
                         </Button>
@@ -461,7 +461,7 @@ export default function PrivatePaymentsPage() {
                           isDisabled={!connected || !amount || Number(amount) <= 0}
                         >
                           Deposit Privately
-                        </Button>
+                </Button>
                       </div>
                     </div>
                   </Tab>
@@ -494,12 +494,12 @@ export default function PrivatePaymentsPage() {
                         <label className="text-sm font-semibold text-gray-700 mb-2 block">
                           Amount
                         </label>
-                        <Input
-                          type="number"
+                <Input
+                  type="number"
                           placeholder="0.00"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          variant="bordered"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  variant="bordered"
                           classNames={{
                             inputWrapper: "h-14",
                             input: "text-lg font-semibold"
@@ -529,15 +529,15 @@ export default function PrivatePaymentsPage() {
                         </CardBody>
                       </Card>
 
-                      <Button
-                        color="primary"
+                <Button 
+                  color="primary" 
                         className="w-full font-semibold h-12"
                         onClick={() => toast.info("Send payment functionality coming soon")}
                         isDisabled={!recipient || !amount || Number(amount) <= 0}
                       >
                         <Send className="w-4 h-4 mr-2" />
                         Send Private Payment
-                      </Button>
+                </Button>
                     </div>
                   </Tab>
                 </Tabs>
@@ -562,8 +562,8 @@ export default function PrivatePaymentsPage() {
                 </Card>
               </CardBody>
             </Card>
-          </>
-        )}
+              </>
+            )}
       </div>
     </div>
   );

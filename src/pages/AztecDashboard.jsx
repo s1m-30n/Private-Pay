@@ -54,16 +54,16 @@ export default function AztecDashboard() {
             </Button>
             <div className="flex items-center gap-3">
               <img src="/assets/aztec.png" alt="Aztec" className="w-10 h-10 rounded-full" />
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                  <span className="text-primary">Aztec</span>
-                  <Chip size="sm" color="primary" variant="flat">
-                    Private Smart Contracts
-                  </Chip>
-                </h1>
-                <p className="text-gray-500 text-sm mt-1">
-                  Encrypted computation and private state
-                </p>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <span className="text-primary">Aztec</span>
+                <Chip size="sm" color="primary" variant="flat">
+                  Private Smart Contracts
+                </Chip>
+              </h1>
+              <p className="text-gray-500 text-sm mt-1">
+                Encrypted computation and private state
+              </p>
               </div>
             </div>
           </div>

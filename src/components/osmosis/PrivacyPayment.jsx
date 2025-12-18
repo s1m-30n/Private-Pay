@@ -34,7 +34,7 @@ export const PrivacyPayment = () => {
                     Generate a one-time stealth link. The recipient cannot identify you, and observers cannot trace the payment.
                 </p>
 
-                <div className="space-y-4">
+             <div className="space-y-4">
                     <Input
                         label="Recipient (Optional)"
                         placeholder="@username or email"
@@ -48,12 +48,12 @@ export const PrivacyPayment = () => {
                         description="Optional: for notification purposes only"
                     />
 
-                    <AnimatePresence>
-                        {link ? (
-                            <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
+                <AnimatePresence>
+                    {link ? (
+                        <motion.div 
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
                             >
                                 <Card className="bg-gradient-to-br from-blue-600 to-indigo-600 border border-blue-500 shadow-lg">
                                     <CardBody className="p-4">
@@ -72,24 +72,24 @@ export const PrivacyPayment = () => {
                                             >
                                                 {copied ? <Check className="w-4 h-4 text-green-200" /> : <Copy className="w-4 h-4" />}
                                             </Button>
-                                        </div>
+                            </div>
                                         <p className="text-xs text-white/90 mt-3">
                                             Share this link securely. Each payment uses a unique stealth address.
                                         </p>
                                     </CardBody>
                                 </Card>
-                            </motion.div>
-                        ) : (
+                        </motion.div>
+                    ) : (
                             <Button
-                                onClick={generateStealthLink}
+                            onClick={generateStealthLink}
                                 className="w-full h-12 font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-500 hover:to-indigo-500 transition-all"
                                 startContent={<Zap className="w-5 h-5" />}
-                            >
-                                Generate Stealth Link
+                        >
+                            Generate Stealth Link
                             </Button>
-                        )}
-                    </AnimatePresence>
-                </div>
+                    )}
+                </AnimatePresence>
+             </div>
             </CardBody>
         </Card>
     );

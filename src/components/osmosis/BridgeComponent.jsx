@@ -73,7 +73,7 @@ export const BridgeComponent = () => {
       <CardBody className="p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
           <ArrowLeftRight className="w-5 h-5 text-blue-600" />
-          Privacy Bridge (IBC ↔ Zcash)
+        Privacy Bridge (IBC ↔ Zcash)
         </h3>
 
         <div className="space-y-4">
@@ -83,10 +83,10 @@ export const BridgeComponent = () => {
             <div className="flex gap-3 p-4 border border-gray-200 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 items-center">
               <img src="/assets/osmosis-logo.png" alt="Osmosis" className="w-8 h-8 rounded-full" />
               <Input
-                type="number"
-                placeholder="0.00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                    type="number" 
+                    placeholder="0.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
                 isDisabled={isBridging}
                 classNames={{
                   inputWrapper: "h-12 bg-white border-gray-200 flex-1 focus-within:border-blue-400",
@@ -99,15 +99,15 @@ export const BridgeComponent = () => {
                 }
                 variant="bordered"
               />
-            </div>
-          </div>
+             </div>
+        </div>
 
           {/* Arrow */}
           <div className="flex justify-center -my-2 z-10 relative">
             <div className="bg-gradient-to-br from-blue-100 to-indigo-100 p-3 rounded-full border-2 border-blue-300 shadow-lg flex items-center justify-center">
               <ArrowLeftRight size={20} className="text-blue-600" />
             </div>
-          </div>
+        </div>
 
           {/* To Section */}
           <div>
@@ -116,7 +116,7 @@ export const BridgeComponent = () => {
               <img src="/assets/zcash_logo.png" alt="Zcash" className="w-8 h-8 rounded-full" />
               <div className="flex-1 bg-white/70 rounded-lg px-4 py-3 border border-gray-200">
                 <div className="text-2xl font-bold text-gray-900">
-                  {amount ? (parseFloat(amount) * 0.05).toFixed(4) : '0.00'}
+                     {amount ? (parseFloat(amount) * 0.05).toFixed(4) : '0.00'}
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-sm font-semibold text-gray-700">ZEC</span>
@@ -126,8 +126,8 @@ export const BridgeComponent = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+             </div>
+        </div>
 
           {/* Status */}
           {step !== 'idle' && step !== 'completed' && (
@@ -151,7 +151,7 @@ export const BridgeComponent = () => {
           )}
 
           {/* Success */}
-          {step === 'completed' ? (
+        {step === 'completed' ? (
             <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200">
               <CardBody className="p-4">
                 <div className="flex items-center gap-3">
@@ -161,18 +161,18 @@ export const BridgeComponent = () => {
                   <div className="flex-1">
                     <p className="font-bold text-green-900">Bridge Successful!</p>
                     <p className="text-sm text-green-700">Assets sent to Bridge Vault.</p>
-                    {txHash && (
-                      <a
-                        href={`https://www.mintscan.io/osmosis/tx/${txHash}`}
-                        target="_blank"
+                 {txHash && (
+                    <a 
+                        href={`https://www.mintscan.io/osmosis/tx/${txHash}`} 
+                        target="_blank" 
                         rel="noopener noreferrer"
                         className="text-xs text-green-600 hover:text-green-700 hover:underline flex items-center gap-1 mt-1"
-                      >
+                    >
                         View Transaction <ExternalLink size={12} />
-                      </a>
-                    )}
+                    </a>
+                 )}
                   </div>
-                </div>
+             </div>
                 <Button
                   variant="bordered"
                   className="w-full mt-3 border-blue-200 text-blue-700 hover:bg-blue-50"
@@ -186,19 +186,19 @@ export const BridgeComponent = () => {
                 </Button>
               </CardBody>
             </Card>
-          ) : (
+        ) : (
             <Button
               className="w-full h-12 font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-500 hover:to-indigo-500 transition-all"
-              onClick={handleBridge}
+                onClick={handleBridge}
               isDisabled={!amount || isBridging}
               isLoading={isBridging}
             >
-              {step === 'signing' ? 'Signing Transaction...' :
-               step === 'bridging' ? 'Bridging Assets...' :
-               'Bridge to Privacy'}
+                {step === 'signing' ? 'Signing Transaction...' : 
+                 step === 'bridging' ? 'Bridging Assets...' : 
+                 'Bridge to Privacy'}
             </Button>
-          )}
-        </div>
+        )}
+      </div>
       </CardBody>
     </Card>
   );

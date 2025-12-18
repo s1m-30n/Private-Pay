@@ -311,9 +311,9 @@ export default function PrivateSwapPage() {
             </Button>
             <div className="flex items-center gap-3">
               <img src="/assets/arcium.png" alt="Arcium" className="w-8 h-8 rounded-full" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Private Swap</h1>
-                <p className="text-gray-500 text-sm">MEV-protected trading</p>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Private Swap</h1>
+              <p className="text-gray-500 text-sm">MEV-protected trading</p>
               </div>
             </div>
           </div>
@@ -356,14 +356,14 @@ export default function PrivateSwapPage() {
               </div>
               <div className="flex gap-3">
                 <div className="relative w-32">
-                  <Select
-                    selectedKeys={[inputToken]}
+                <Select
+                  selectedKeys={[inputToken]}
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0];
                       if (selected) setInputToken(selected);
                     }}
                     className="w-full"
-                    variant="bordered"
+                  variant="bordered"
                     startContent={
                       <img 
                         src={TOKENS.find(t => t.id === inputToken)?.icon} 
@@ -375,7 +375,7 @@ export default function PrivateSwapPage() {
                       trigger: "h-14",
                       value: "flex items-center"
                     }}
-                  >
+                >
                   {TOKENS.map((token) => (
                     <SelectItem 
                       key={token.id} 
@@ -386,21 +386,21 @@ export default function PrivateSwapPage() {
                       {token.symbol}
                     </SelectItem>
                   ))}
-                  </Select>
+                </Select>
                 </div>
                 <div className="flex-1 relative">
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    value={inputAmount}
-                    onChange={(e) => setInputAmount(e.target.value)}
-                    className="flex-1"
-                    variant="bordered"
-                    classNames={{
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  value={inputAmount}
+                  onChange={(e) => setInputAmount(e.target.value)}
+                  className="flex-1"
+                  variant="bordered"
+                  classNames={{
                       input: "text-gray-900 text-xl text-right pr-12",
                       inputWrapper: "h-14 flex items-center"
-                    }}
-                  />
+                  }}
+                />
                   <div className="absolute right-3 flex items-center" style={{ top: '50%', transform: 'translateY(-50%)' }}>
                     <img 
                       src={TOKENS.find(t => t.id === inputToken)?.icon} 
@@ -434,14 +434,14 @@ export default function PrivateSwapPage() {
               </div>
               <div className="flex gap-3">
                 <div className="relative w-32">
-                  <Select
-                    selectedKeys={[outputToken]}
+                <Select
+                  selectedKeys={[outputToken]}
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0];
                       if (selected) setOutputToken(selected);
                     }}
                     className="w-full"
-                    variant="bordered"
+                  variant="bordered"
                     startContent={
                       <img 
                         src={TOKENS.find(t => t.id === outputToken)?.icon} 
@@ -453,7 +453,7 @@ export default function PrivateSwapPage() {
                       trigger: "h-14",
                       value: "flex items-center"
                     }}
-                  >
+                >
                   {TOKENS.filter((t) => t.id !== inputToken).map((token) => (
                     <SelectItem 
                       key={token.id} 
@@ -464,7 +464,7 @@ export default function PrivateSwapPage() {
                       {token.symbol}
                     </SelectItem>
                   ))}
-                  </Select>
+                </Select>
                 </div>
                 <div className="flex-1 bg-gray-50 rounded-xl border border-gray-200 px-4 py-3 text-right flex items-center justify-end gap-2 min-h-[56px]">
                   <span className="text-gray-900 text-xl font-mono">

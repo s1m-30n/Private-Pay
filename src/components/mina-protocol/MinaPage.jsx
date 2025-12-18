@@ -83,7 +83,7 @@ export default function MinaPage() {
                 <img src="/assets/mina_logo.png" alt="Mina" className="w-10 h-10 rounded-full" />
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
                     Mina Protocol
-                </h1>
+            </h1>
             </div>
 
             <p className="text-gray-600 max-w-lg text-center">
@@ -102,16 +102,16 @@ export default function MinaPage() {
                                 Connect your wallet to start using Mina's zero-knowledge features
                             </p>
                         </div>
-                        <Button
-                            color="warning"
-                            variant="shadow"
-                            size="lg"
-                            className="font-bold text-white"
-                            onClick={handleConnect}
+                    <Button
+                        color="warning"
+                        variant="shadow"
+                        size="lg"
+                        className="font-bold text-white"
+                        onClick={handleConnect}
                             startContent={<img src="/assets/auro_logo.png" alt="Auro" className="w-5 h-5 rounded-full" />}
-                        >
-                            {isInstalled ? "Connect Auro Wallet" : "Install Auro Wallet"}
-                        </Button>
+                    >
+                        {isInstalled ? "Connect Auro Wallet" : "Install Auro Wallet"}
+                    </Button>
                         {!isInstalled && (
                             <p className="text-xs text-gray-400 text-center">
                                 Don't have Auro Wallet? <a href="https://www.aurowallet.com/" target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:underline">Install it here</a>
@@ -139,7 +139,7 @@ export default function MinaPage() {
                                     {(minaBalance?.simulated > 0) && (
                                         <div className="text-xs text-green-600 font-semibold bg-green-50 px-2 py-1 rounded w-fit mt-2">
                                             + {minaBalance.simulated} Simulated (Bridge)
-                                        </div>
+                            </div>
                                     )}
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
@@ -175,7 +175,8 @@ export default function MinaPage() {
                                 classNames={{
                                     tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider px-6",
                                     tab: "max-w-fit px-0 h-12",
-                                    tabContent: "group-data-[selected=true]:text-orange-600",
+                                    tabContent: "group-data-[selected=true]:text-orange-600 group-data-[selected=true]:font-semibold",
+                                    cursor: "bg-gradient-to-r from-orange-500 to-amber-500",
                                 }}
                             >
                                 <Tab
@@ -225,7 +226,7 @@ export default function MinaPage() {
                                             </div>
                                         </div>
 
-                                        <Card className="bg-primary/10 border border-primary/20">
+                                        <Card className="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200">
                                             <CardBody className="p-4">
                                                 <div className="flex items-start gap-3">
                                                     <Shield className="w-5 h-5 text-orange-600 mt-0.5" />
@@ -241,15 +242,15 @@ export default function MinaPage() {
                                             </CardBody>
                                         </Card>
 
-                                        <Button
-                                            color="danger"
-                                            variant="light"
-                                            className="self-end"
-                                            size="sm"
-                                            onClick={disconnect}
-                                        >
+                            <Button
+                                color="danger"
+                                variant="light"
+                                className="self-end"
+                                size="sm"
+                                onClick={disconnect}
+                            >
                                             Disconnect Wallet
-                                        </Button>
+                            </Button>
                                     </div>
                                 </Tab>
 
@@ -268,26 +269,26 @@ export default function MinaPage() {
                                             Send MINA to any Mina address. Transactions are private and use zero-knowledge proofs.
                                         </p>
 
-                                        <Input
-                                            label="Recipient Address"
+                            <Input
+                                label="Recipient Address"
                                             placeholder="B62qmBFt..."
-                                            value={recipient}
-                                            onChange={(e) => setRecipient(e.target.value)}
-                                            variant="bordered"
+                                value={recipient}
+                                onChange={(e) => setRecipient(e.target.value)}
+                                variant="bordered"
                                             classNames={{
                                                 inputWrapper: "h-12"
                                             }}
                                             description="Enter the Mina address of the recipient"
-                                        />
+                            />
 
                                         <div>
                                             <label className="text-sm font-semibold text-gray-700 mb-2 block">Amount</label>
-                                            <Input
+                            <Input
                                                 type="number"
-                                                placeholder="0.00"
-                                                value={amount}
-                                                onChange={(e) => setAmount(e.target.value)}
-                                                variant="bordered"
+                                placeholder="0.00"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
+                                variant="bordered"
                                                 classNames={{
                                                     inputWrapper: "h-14",
                                                     input: "text-lg font-semibold"
@@ -304,28 +305,28 @@ export default function MinaPage() {
                                             </p>
                                         </div>
 
-                                        <Input
-                                            label="Memo (Optional)"
+                            <Input
+                                label="Memo (Optional)"
                                             placeholder="Payment reference or note"
-                                            value={memo}
-                                            onChange={(e) => setMemo(e.target.value)}
-                                            variant="bordered"
+                                value={memo}
+                                onChange={(e) => setMemo(e.target.value)}
+                                variant="bordered"
                                             classNames={{
                                                 inputWrapper: "h-12"
                                             }}
                                             description="Add a memo to this transaction (optional)"
-                                        />
+                            />
 
-                                        <Button
-                                            className="bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold h-12 mt-2"
-                                            size="lg"
-                                            onClick={handleSend}
-                                            isLoading={isSending}
+                            <Button
+                                className="bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold h-12 mt-2"
+                                size="lg"
+                                onClick={handleSend}
+                                isLoading={isSending}
                                             isDisabled={!recipient || !amount || parseFloat(amount) <= 0}
                                             startContent={!isSending && <Send className="w-5 h-5" />}
-                                        >
+                            >
                                             {isSending ? "Sending Transaction..." : "Send MINA"}
-                                        </Button>
+                            </Button>
                                     </div>
                                 </Tab>
                             </Tabs>
