@@ -3,6 +3,7 @@ import { Button, Card, CardBody, Input, Select, SelectItem, Progress } from "@ne
 import { useAptos } from "../providers/AptosProvider";
 import { useMina } from "../components/mina-protocol/MinaProvider";
 import { useZcash } from "../providers/ZcashProvider";
+import { buildBridgeOpReturn } from "../lib/zcash";
 import { sendAptTransfer } from "../lib/aptos";
 import { sendMinaPayment } from "../components/mina-protocol/mina"; // Mock for receiving
 import { Icons } from "../components/shared/Icons";
@@ -114,6 +115,20 @@ export default function BridgePage() {
             }
 
             setCompletedTx(prev => ({ ...prev, lock: lockTxHash }));
+
+            // Build bridge OP_RETURN payload and create simulated bridge tx on Zcash provider
+            try {
+                const commitment = '0x' + lockTxHash.slice(2).padEnd(32, '0').slice(0, 32);
+                const nullifier = '0x' + (Date.now()).toString(16).padEnd(32, '0').slice(0, 32);
+                const proof = '0x' + '00'.repeat(64);
+                const op = buildBridgeOpReturn({ commitment, nullifier, proof, amount: parseFloat(amount), recipient: destChain === 'mina' ? 'miden1q...' : 'zcash1q...' });
+                if (sourceChain === 'aptos') {
+                    // Store simulated bridge tx via Zcash provider for demo
+                    zcash.createBridgeTx({ commitment, nullifier, proof, amount: parseFloat(amount), recipient: destChain === 'mina' ? 'miden1q...' : 'zcash1q...' });
+                }
+            } catch (e) {
+                console.warn('Failed to create simulated bridge OP_RETURN', e);
+            }
 
             // 2. SIMULATE RELAYER DELAY
             setStep(2);
