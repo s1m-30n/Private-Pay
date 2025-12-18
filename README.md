@@ -244,34 +244,6 @@ PrivatePay was developed using **Kiro AI** - an advanced AI-powered development 
 
 **🔍 Explore the artifacts:** [.kiro directory](./.kiro/)
 
----
-
-## 🙏 Acknowledgments
-
-### Technology
-
-- **Kiro AI** - For revolutionizing our development process
-- **Aptos Foundation** - For the amazing blockchain platform
-- **Oasis Protocol** - Inspiration from ROFL and Sapphire
-- **BIP 0352 / EIP 5564** - Stealth address standards
-- **@noble** libraries - Cryptographic primitives
-
----
-
-<p align="center">
-  <strong>Built with 🐙 by developers who believe privacy is a fundamental right</strong>
-</p>
-
-<p align="center">
-  No more wallet exposure. No more targeted attacks. No more financial surveillance.
-</p>
-
-<p align="center">
-  <strong>PrivatePay: Where every transaction is invisible.</strong>
-</p>
-
----
-
 ## 🧠 System Architecture Overview
 
 Below is a concise, technical view of how the full PrivatePay system is wired across chains and infra.
@@ -281,23 +253,23 @@ Below is a concise, technical view of how the full PrivatePay system is wired ac
 ```mermaid
 flowchart LR
   subgraph User
-    UI[PrivatePay Web App (React + Vite)]
+    UI[PrivatePay Web App]
   end
 
   subgraph Wallets
-    APTOS[Petra / Aptos]
-    SOL[Phantom / Solflare]
-    STARK[ArgentX / Braavos]
-    OSMO[Keplr / Leap]
+    APTOS[Petra Aptos]
+    SOL[Phantom Solflare]
+    STARK[ArgentX Braavos]
+    OSMO[Keplr Leap]
     MINA[Auro]
     NEARW[Near Wallet]
-    EVMW[EVM Wallets (Metamask, etc.)]
+    EVMW[EVM Wallets]
   end
 
   subgraph Chains
     Aptos[Aptos]
-    Solana[Solana + Arcium]
-    Starknet[Starknet / Ztarknet]
+    Solana[Solana Arcium]
+    Starknet[Starknet Ztarknet]
     Osmosis[Osmosis]
     Mina[Mina]
     Zcash[Zcash]
@@ -312,7 +284,7 @@ flowchart LR
     Axelar[(Axelar GMP)]
     AztecL2[(Aztec L2)]
     ArciumMPC[(Arcium MPC)]
-    Relayer[Relayers & ZK Provers (Zcash bridges)]
+    Relayer[Relayers ZK Provers]
   end
 
   UI --> Wallets
