@@ -10,7 +10,6 @@ import { useZcash } from "../providers/ZcashProvider";
 import { StarknetBridgeManager } from "../lib/starknet/bridge";
 import toast from "react-hot-toast";
 import { ArrowRight, ArrowLeft, Shield, Zap, CheckCircle, Loader2 } from "lucide-react";
-import PrivacyNavbar from "../components/shared/PrivacyNavbar.jsx";
 
 const BRIDGE_STEPS = {
   INIT: 0,
@@ -210,9 +209,7 @@ export default function ZcashStarknetBridgePage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-[80vh] gap-8 p-4">
-      <PrivacyNavbar />
-
+    <div className="flex flex-col items-center justify-center w-full min-h-[80vh] gap-8 p-4 pb-24">
       <div className="flex items-center gap-3">
         <Shield className="w-10 h-10 text-green-500" />
         <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Wallet, TrendingUp, Shield, Lock, Unlock, AlertTriangle, CheckCircle, DollarSign, Percent } from "lucide-react";
-import PrivacyNavbar from "../components/shared/PrivacyNavbar";
 import { useStarknet } from "../providers/StarknetProvider";
 
 export default function ZtarknetLendingPage() {
@@ -89,9 +88,7 @@ export default function ZtarknetLendingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <PrivacyNavbar />
-
+      <div className="max-w-6xl mx-auto px-4 py-8 pb-24">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link

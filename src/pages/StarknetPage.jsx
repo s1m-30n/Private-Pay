@@ -9,7 +9,6 @@ import { useStarknet } from "../providers/StarknetProvider";
 import { generateMetaAddressKeys, splitPublicKeyForContract, generateStealthAddress, generatePrivateKey } from "../lib/starknet/stealthAddress";
 import toast from "react-hot-toast";
 import { Copy, Check, Wallet, Send, Shield, ExternalLink } from "lucide-react";
-import PrivacyNavbar from "../components/shared/PrivacyNavbar.jsx";
 
 export default function StarknetPage() {
   const {
@@ -135,9 +134,7 @@ export default function StarknetPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-[80vh] gap-8 p-4">
-      <PrivacyNavbar />
-
+    <div className="flex flex-col items-center justify-center w-full min-h-[80vh] gap-8 p-4 pb-24">
       <div className="flex items-center gap-3">
         <Shield className="w-10 h-10 text-purple-500" />
         <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
