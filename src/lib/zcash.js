@@ -5,16 +5,62 @@
 import { Buffer } from 'buffer';
 import { encryptEnvelope, encryptEnvelopeAsymmetric } from '../relayer/envelope.js';
 
+// Mock implementation for simulation - generates a simulated Zcash wallet
 export const generateZcashWallet = () => {
-    throw new Error('generateZcashWallet not available in simulation.');
+    // Generate a mock mnemonic (12 words for simulation)
+    const mockWords = [
+        'abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract', 'absurd', 'abuse',
+        'access', 'accident', 'account', 'accuse', 'achieve', 'acid', 'acoustic', 'acquire', 'across', 'act',
+        'action', 'actor', 'actual', 'adapt', 'add', 'addict', 'address', 'adjust', 'admit', 'adult',
+        'advance', 'advice', 'aerobic', 'affair', 'afford', 'afraid', 'again', 'age', 'agent', 'agree'
+    ];
+    
+    const mnemonic = Array.from({ length: 12 }, () => 
+        mockWords[Math.floor(Math.random() * mockWords.length)]
+    ).join(' ');
+    
+    // Generate a mock transparent address (starts with 't' for testnet)
+    // Zcash transparent addresses are typically 35 characters, starting with 't' or 'tm'
+    const randomChars = Array.from({ length: 33 }, () => 
+        '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random() * 62)]
+    ).join('');
+    const mockAddress = 'tm' + randomChars;
+    
+    return {
+        address: mockAddress,
+        mnemonic: mnemonic,
+        privateKey: 'mock_private_key_' + Date.now(),
+        publicKey: 'mock_public_key_' + Date.now(),
+        network: 'testnet'
+    };
 };
 
-export const getWalletFromMnemonic = () => {
-    throw new Error('getWalletFromMnemonic not available in simulation.');
+// Mock implementation for importing wallet from mnemonic
+export const getWalletFromMnemonic = (mnemonic) => {
+    if (!mnemonic || mnemonic.trim().split(' ').length < 12) {
+        throw new Error('Invalid mnemonic: must be at least 12 words');
+    }
+    
+    // Generate a mock transparent address from mnemonic hash
+    const mnemonicHash = Buffer.from(mnemonic).toString('hex').substring(0, 33);
+    const mockAddress = 'tm' + mnemonicHash;
+    
+    return {
+        address: mockAddress,
+        mnemonic: mnemonic.trim(),
+        privateKey: 'mock_private_key_' + Date.now(),
+        publicKey: 'mock_public_key_' + Date.now(),
+        network: 'testnet'
+    };
 };
 
-export const validateZcashAddress = () => {
-    throw new Error('validateZcashAddress not available in simulation.');
+// Mock implementation for address validation
+export const validateZcashAddress = (address) => {
+    if (!address || typeof address !== 'string') {
+        return false;
+    }
+    // Basic validation: transparent addresses start with 't' or 'tm', shielded with 'z' or 'zs'
+    return address.startsWith('t') || address.startsWith('tm') || address.startsWith('z') || address.startsWith('zs');
 };
 
 export const createZcashTransaction = () => {

@@ -2,6 +2,9 @@ import { useChain } from '@cosmos-kit/react';
 import { coins } from '@cosmjs/amino';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Card, CardBody, Input, Button } from '@nextui-org/react';
+import { ArrowLeftRight, Shield, CheckCircle2, Loader2, ExternalLink } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 // PrivatePay Bridge Vault on Osmosis
 const BRIDGE_VAULT_ADDRESS = 'osmo18s5lynnx550aw5rqlmg32cne6083893nq8p5q4'; 
@@ -66,97 +69,137 @@ export const BridgeComponent = () => {
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="border border-gray-800/20 rounded-xl p-6 relative overflow-hidden shadow-lg"
-    >
-      <div className="absolute top-0 right-0 p-4 opacity-20 text-purple-600/20">
-        <svg className="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-        </svg>
-      </div>
+    <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
+      <CardBody className="p-6">
+        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <ArrowLeftRight className="w-5 h-5 text-blue-600" />
+          Privacy Bridge (IBC ↔ Zcash)
+        </h3>
 
-      <h2 className="text-xl font-bold text-black mb-6">
-        Privacy Bridge (IBC ↔ Zcash)
-      </h2>
-
-      <div className="space-y-6">
-        <div className="p-4 rounded-lg border border-gray-800/20">
-             <label className="text-xs text-gray-500 uppercase font-semibold">From (Osmosis)</label>
-             <div className="flex justify-between items-center mt-2">
-                 <input 
-                    type="number" 
-                    placeholder="0.00"
-                    value={amount}
-                    
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="bg-transparent text-2xl font-bold focus:outline-none w-full"
-                 />
-                 <span className="px-3 py-1 rounded text-sm font-bold border border-purple-500/30">
-                     OSMO
-                 </span>
-             </div>
-        </div>
-
-        <div className="flex justify-center -my-3 z-10 relative">
-            <div className="bg-gray-800 p-2 rounded-full border border-gray-700 text-gray-400">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                </svg>
+        <div className="space-y-4">
+          {/* From Section */}
+          <div>
+            <label className="text-sm font-semibold text-gray-700 mb-2 block">From (Osmosis)</label>
+            <div className="flex gap-3 p-4 border border-gray-200 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 items-center">
+              <img src="/assets/osmosis-logo.png" alt="Osmosis" className="w-8 h-8 rounded-full" />
+              <Input
+                type="number"
+                placeholder="0.00"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                isDisabled={isBridging}
+                classNames={{
+                  inputWrapper: "h-12 bg-white border-gray-200 flex-1 focus-within:border-blue-400",
+                  input: "text-lg font-semibold"
+                }}
+                endContent={
+                  <div className="flex items-center gap-1">
+                    <span className="text-blue-600 text-sm font-semibold">OSMO</span>
+                  </div>
+                }
+                variant="bordered"
+              />
             </div>
-        </div>
+          </div>
 
-        <div className="p-4 rounded-lg border border-gray-800/20">
-             <label className="text-xs text-gray-500 uppercase font-semibold">To (Zcash Shielded)</label>
-             <div className="flex justify-between items-center mt-2">
-                 <span className="text-2xl font-bold text-gray-400">
-                     {amount ? (parseFloat(amount) * 0.05).toFixed(4) : '0.00'}
-                 </span>
-                 <span className="bg-yellow-400 px-3 py-1 rounded text-sm">
-                     ZEC
-                 </span>
-             </div>
-             <p className="text-xs text-green-500 mt-2 flex items-center gap-1">
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-                Shielded Address (zs1...)
-             </p>
-        </div>
+          {/* Arrow */}
+          <div className="flex justify-center -my-2 z-10 relative">
+            <div className="bg-gradient-to-br from-blue-100 to-indigo-100 p-3 rounded-full border-2 border-blue-300 shadow-lg flex items-center justify-center">
+              <ArrowLeftRight size={20} className="text-blue-600" />
+            </div>
+          </div>
 
-        {step === 'completed' ? (
-             <div className="bg-green-900/20 border  rounded-lg p-4 text-center">
-                 <p className=" font-bold mb-1">Bridge Successful!</p>
-                 <p className="text-xs text-green-600">Assets sent to Bridge Vault.</p>
-                 {txHash && (
-                    <a 
-                        href={`https://www.mintscan.io/osmosis/tx/${txHash}`} 
-                        target="_blank" 
+          {/* To Section */}
+          <div>
+            <label className="text-sm font-semibold text-gray-700 mb-2 block">To (Zcash Shielded)</label>
+            <div className="flex gap-3 p-4 border border-gray-200 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 items-center">
+              <img src="/assets/zcash_logo.png" alt="Zcash" className="w-8 h-8 rounded-full" />
+              <div className="flex-1 bg-white/70 rounded-lg px-4 py-3 border border-gray-200">
+                <div className="text-2xl font-bold text-gray-900">
+                  {amount ? (parseFloat(amount) * 0.05).toFixed(4) : '0.00'}
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-sm font-semibold text-gray-700">ZEC</span>
+                  <div className="flex items-center gap-1 text-xs text-blue-600">
+                    <CheckCircle2 size={12} />
+                    <span>Shielded Address</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Status */}
+          {step !== 'idle' && step !== 'completed' && (
+            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
+              <CardBody className="p-4">
+                <div className="flex items-center gap-3">
+                  {step === 'signing' ? (
+                    <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 animate-pulse" />
+                  )}
+                  <div>
+                    <p className="font-semibold text-gray-900">
+                      {step === 'signing' ? 'Signing Transaction...' : 'Bridging Assets...'}
+                    </p>
+                    <p className="text-xs text-gray-600">Processing your bridge request</p>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+          )}
+
+          {/* Success */}
+          {step === 'completed' ? (
+            <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200">
+              <CardBody className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                    <CheckCircle2 className="w-8 h-8 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-bold text-green-900">Bridge Successful!</p>
+                    <p className="text-sm text-green-700">Assets sent to Bridge Vault.</p>
+                    {txHash && (
+                      <a
+                        href={`https://www.mintscan.io/osmosis/tx/${txHash}`}
+                        target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[10px] text-gray-500 hover:text-purple-400 block mt-1 break-all"
-                    >
-                        TX: {txHash}
-                    </a>
-                 )}
-                 <button onClick={() => setStep('idle')} className="text-xs text-gray-400 underline mt-2 hover:text-white">Bridge more</button>
-             </div>
-        ) : (
-            <button
-                disabled={!amount || isBridging}
-                onClick={handleBridge}
-                className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
-                    !amount 
-                    ? 'bg-gray-800 text-gray-500 cursor-not-allowed' 
-                    : isBridging 
-                        ? 'bg-gray-800 text-white cursor-wait'
-                        : 'text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-900/20'
-                }`}
+                        className="text-xs text-green-600 hover:text-green-700 hover:underline flex items-center gap-1 mt-1"
+                      >
+                        View Transaction <ExternalLink size={12} />
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  variant="bordered"
+                  className="w-full mt-3 border-blue-200 text-blue-700 hover:bg-blue-50"
+                  onClick={() => {
+                    setStep('idle');
+                    setAmount('');
+                    setTxHash('');
+                  }}
+                >
+                  Bridge More
+                </Button>
+              </CardBody>
+            </Card>
+          ) : (
+            <Button
+              className="w-full h-12 font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:from-blue-500 hover:to-indigo-500 transition-all"
+              onClick={handleBridge}
+              isDisabled={!amount || isBridging}
+              isLoading={isBridging}
             >
-                {step === 'signing' ? 'Signing Transaction...' : 
-                 step === 'bridging' ? 'Bridging Assets...' : 
-                 'Bridge to Privacy'}
-            </button>
-        )}
-      </div>
-    </motion.div>
+              {step === 'signing' ? 'Signing Transaction...' :
+               step === 'bridging' ? 'Bridging Assets...' :
+               'Bridge to Privacy'}
+            </Button>
+          )}
+        </div>
+      </CardBody>
+    </Card>
   );
 };
