@@ -40,8 +40,8 @@
 - ✅ Viewing keys for auditability
 
 **Documentation**:
-- ✅ `docs/BRIDGE_ARCHITECTURE.md` - Complete bridge design
-- ✅ `docs/STABLECOIN_DESIGN.md` - Complete stablecoin design
+- ✅ `docs/architecture/BRIDGE_ARCHITECTURE.md` - Complete bridge design
+- ✅ `docs/architecture/STABLECOIN_DESIGN.md` - Complete stablecoin design
 
 ---
 

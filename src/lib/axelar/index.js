@@ -742,6 +742,8 @@ export function getAllSupportedChains() {
   return Object.entries(AXELAR_CHAINS).map(([key, chain]) => ({
     key,
     ...chain,
+    // Map icon to image and use asset logos
+    image: CHAIN_LOGOS[key] || chain.icon || "/assets/eth-logo.png",
   }));
 }
 
@@ -750,6 +752,27 @@ export function getAllSupportedChains() {
  * @param {string} network - "testnet" or "mainnet"
  * @returns {Array} - Array of supported chain objects
  */
+// Logo mapping for chains
+const CHAIN_LOGOS = {
+  ethereum: "/assets/eth-logo.png",
+  polygon: "/assets/eth-logo.png", // Fallback - polygon logo not in assets
+  avalanche: "/assets/avalanche.png",
+  arbitrum: "/assets/arbitrum.png",
+  optimism: "/assets/optimism.png",
+  base: "/assets/base.png",
+  bnb: "/assets/bsc-logo.png",
+  fantom: "/assets/fantom_logo.png",
+  scroll: "/assets/scroll.png",
+  blast: "/assets/blast_logo.png",
+  oasis: "/assets/oasis-logo.png",
+  moonbeam: "/assets/eth-logo.png", // Fallback
+  linea: "/assets/eth-logo.png", // Fallback
+  mantle: "/assets/eth-logo.png", // Fallback
+  celo: "/assets/eth-logo.png", // Fallback
+  kava: "/assets/eth-logo.png", // Fallback
+  filecoin: "/assets/eth-logo.png", // Fallback
+};
+
 export function getSupportedChains(network = "testnet") {
   const isMainnet = network === "mainnet";
 
@@ -780,6 +803,8 @@ export function getSupportedChains(network = "testnet") {
   }).map(([key, chain]) => ({
     key,
     ...chain,
+    // Map icon to image and use asset logos
+    image: CHAIN_LOGOS[key] || chain.icon || "/assets/eth-logo.png",
     // Add testnet support flag
     ...(isMainnet ? {} : {
       hasTestnetSupport: true

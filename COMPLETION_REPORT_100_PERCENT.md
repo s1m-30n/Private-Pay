@@ -159,7 +159,7 @@ npm run test:e2e:stablecoin  # Stablecoin only
 ### 5. ✅ **Deployment Guide** - **COMPLETE**
 
 **Files Created**:
-- ✅ `docs/DEPLOYMENT_GUIDE.md` - Comprehensive deployment guide
+- ✅ `docs/guides/DEPLOYMENT_GUIDE.md` - Comprehensive deployment guide
 
 **Sections**:
 - ✅ Prerequisites and setup
@@ -215,7 +215,7 @@ All components are now **production-ready**:
 
 2. **Generate Proof Keys**:
    ```bash
-   # Follow instructions in docs/DEPLOYMENT_GUIDE.md
+   # Follow instructions in docs/guides/DEPLOYMENT_GUIDE.md
    # Generate circuit, proving key, and verifying key
    ```
 
@@ -232,7 +232,7 @@ All components are now **production-ready**:
 
 5. **Deploy to Production**:
    ```bash
-   # Follow docs/DEPLOYMENT_GUIDE.md
+   # Follow docs/guides/DEPLOYMENT_GUIDE.md
    # Deploy contracts, backend, and frontend
    ```
 
@@ -273,7 +273,7 @@ All components are now **production-ready**:
 5. `backend/services/mpc.js`
 6. `tests/integration/bridge.e2e.test.js`
 7. `tests/integration/stablecoin.e2e.test.js`
-8. `docs/DEPLOYMENT_GUIDE.md`
+8. `docs/guides/DEPLOYMENT_GUIDE.md`
 9. `COMPLETION_REPORT_100_PERCENT.md`
 
 ### Modified Files:

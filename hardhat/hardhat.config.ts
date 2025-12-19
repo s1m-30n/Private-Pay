@@ -68,6 +68,11 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 97,
     },
+    'fhenix-testnet': {
+      url: process.env.FHENIX_TESTNET_RPC_URL || "https://api.nitrogen.fhenix.zone",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 8008148,
+    }
   },
   etherscan: {
     customChains: [

@@ -1,0 +1,48 @@
+// src/relayer/server.js
+// Simple HTTP API to control the relayer and submit bridge events.
+
+import express from 'express';
+import config from './config.js';
+import ZcashMidenRelayer from './index.js';
+
+const app = express();
+app.use(express.json());
+
+let relayer = null;
+
+app.get('/status', (req, res) => {
+  res.json({ running: !!relayer && relayer.isRunning });
+});
+
+app.post('/start', async (req, res) => {
+  if (relayer && relayer.isRunning) return res.status(400).json({ error: 'already running' });
+  relayer = new ZcashMidenRelayer({ ...config, useRealClients: req.body.useRealClients || false });
+  relayer.start().catch(err => console.error('Relayer failed', err));
+  return res.json({ started: true });
+});
+
+app.post('/stop', async (req, res) => {
+  if (!relayer) return res.status(400).json({ error: 'not running' });
+  await relayer.stop();
+  relayer = null;
+  res.json({ stopped: true });
+});
+
+// Submit a proof payload manually (useful for testing)
+app.post('/submit-proof', async (req, res) => {
+  const payload = req.body;
+  if (!relayer) return res.status(400).json({ error: 'relayer not running' });
+  try {
+    const result = await relayer.miden.submitBridgeProof(payload);
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+const port = process.env.RELAYER_PORT || 3001;
+if (process.env.RELAYER_RUN === '1') {
+  app.listen(port, () => console.log(`Relayer HTTP API listening on ${port}`));
+}
+
+export default app;

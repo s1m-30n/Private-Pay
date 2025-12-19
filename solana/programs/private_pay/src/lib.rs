@@ -13,7 +13,7 @@ const COMP_DEF_OFFSET_EXECUTE_SWAP: u32 = comp_def_offset("execute_swap");
 const COMP_DEF_OFFSET_PLACE_ORDER: u32 = comp_def_offset("place_order");
 const COMP_DEF_OFFSET_MATCH_ORDERS: u32 = comp_def_offset("match_orders");
 
-declare_id!("3tFjfuwwpWkEJfo5JYTFyozc4rEa8ysksgWJUcUq3qTx");
+declare_id!("27Pd4tb2NWZQuerC196RCQQHg27cuMiMgf5hNz3mPSP7");
 
 #[arcium_program]
 pub mod private_pay {

@@ -80,6 +80,8 @@ export default function ArciumDashboard() {
             >
               <Icons.back className="w-5 h-5" />
             </Button>
+            <div className="flex items-center gap-3">
+              <img src="/assets/arcium.png" alt="Arcium" className="w-10 h-10 rounded-full" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                 <span className="text-primary">Arcium</span>
@@ -90,6 +92,7 @@ export default function ArciumDashboard() {
               <p className="text-gray-500 text-sm mt-1">
                 Encrypted computation on Solana
               </p>
+              </div>
             </div>
           </div>
 
@@ -103,7 +106,10 @@ export default function ArciumDashboard() {
                 </span>
               </div>
             )}
-            <WalletMultiButton className="!bg-primary !rounded-xl !h-10" />
+            <WalletMultiButton 
+              className="!bg-[#0d08e3] !rounded-xl !h-10 hover:!bg-[#0e0dc6] !text-white" 
+              style={{ backgroundColor: '#0d08e3' }}
+            />
           </div>
         </div>
 
@@ -141,7 +147,10 @@ export default function ArciumDashboard() {
                 Connect your wallet to access private payments, swaps, and dark pool trading
                 powered by Arcium's encrypted computation network.
               </p>
-              <WalletMultiButton className="!bg-primary !rounded-xl !px-8 !py-3" />
+              <WalletMultiButton 
+                className="!bg-[#0d08e3] !rounded-xl !px-8 !py-3 hover:!bg-[#0e0dc6] !text-white" 
+                style={{ backgroundColor: '#0d08e3' }}
+              />
             </CardBody>
           </Card>
         ) : (

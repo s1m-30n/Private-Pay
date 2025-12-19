@@ -1,7 +1,10 @@
 [workspace]
 members = [
-    "programs/*",
-    "encrypted-ixs"
+    "programs/zcash_bridge",
+]
+exclude = [
+    "programs/private_pay",
+    "encrypted-ixs",
 ]
 resolver = "2"
 

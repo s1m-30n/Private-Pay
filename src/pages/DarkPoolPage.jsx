@@ -412,6 +412,8 @@ export default function DarkPoolPage() {
             >
               <Icons.back className="w-5 h-5" />
             </Button>
+            <div className="flex items-center gap-3">
+              <img src="/assets/arcium.png" alt="Arcium" className="w-8 h-8 rounded-full" />
             <div>
               <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                 Dark Pool
@@ -422,23 +424,64 @@ export default function DarkPoolPage() {
               <p className="text-gray-500 text-sm">
                 Trade with hidden orders, protected from front-running
               </p>
+              </div>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <Select
               selectedKeys={[selectedPair]}
-              onChange={(e) => setSelectedPair(e.target.value)}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0];
+                if (selected) setSelectedPair(selected);
+              }}
               className="w-40"
               variant="bordered"
+              startContent={
+                <div className="flex items-center justify-center gap-1">
+                  <img 
+                    src="/assets/solana_logo.png" 
+                    alt={currentPair?.base} 
+                    className="w-4 h-4 rounded-full" 
+                  />
+                  <span className="text-gray-400 text-xs">/</span>
+                  <img 
+                    src={currentPair?.quote === "USDC" ? "/assets/usdc.png" : "/assets/usdt_logo.png"} 
+                    alt={currentPair?.quote} 
+                    className="w-4 h-4 rounded-full" 
+                  />
+                </div>
+              }
+              classNames={{
+                trigger: "h-10",
+                value: "flex items-center"
+              }}
             >
-              {TRADING_PAIRS.map((pair) => (
-                <SelectItem key={pair.id} value={pair.id}>
+              {TRADING_PAIRS.map((pair) => {
+                const baseIcon = "/assets/solana_logo.png";
+                const quoteIcon = pair.quote === "USDC" ? "/assets/usdc.png" : "/assets/usdt_logo.png";
+                return (
+                  <SelectItem 
+                    key={pair.id} 
+                    value={pair.id}
+                    textValue={`${pair.base}/${pair.quote}`}
+                    startContent={
+                      <div className="flex items-center justify-center gap-1">
+                        <img src={baseIcon} alt={pair.base} className="w-4 h-4 rounded-full" />
+                        <span className="text-gray-400 text-xs">/</span>
+                        <img src={quoteIcon} alt={pair.quote} className="w-4 h-4 rounded-full" />
+                      </div>
+                    }
+                  >
                   {pair.base}/{pair.quote}
                 </SelectItem>
-              ))}
+                );
+              })}
             </Select>
-            <WalletMultiButton className="!bg-primary !rounded-xl !h-10" />
+            <WalletMultiButton 
+              className="!bg-[#0d08e3] !rounded-xl !h-10 hover:!bg-[#0e0dc6] !text-white" 
+              style={{ backgroundColor: '#0d08e3' }}
+            />
           </div>
         </div>
 
@@ -528,9 +571,16 @@ export default function DarkPoolPage() {
                     onChange={(e) => setOrderPrice(e.target.value)}
                     variant="bordered"
                     endContent={
+                      <div className="flex items-center gap-1">
+                        <img 
+                          src={currentPair?.quote === "USDC" ? "/assets/usdc.png" : "/assets/usdt_logo.png"} 
+                          alt={currentPair?.quote} 
+                          className="w-4 h-4 rounded-full" 
+                        />
                       <span className="text-gray-500 text-sm">
                         {currentPair?.quote}
                       </span>
+                      </div>
                     }
                   />
                 </div>
@@ -548,23 +598,39 @@ export default function DarkPoolPage() {
                   onChange={(e) => setOrderSize(e.target.value)}
                   variant="bordered"
                   endContent={
+                    <div className="flex items-center gap-1">
+                      <img 
+                        src="/assets/solana_logo.png" 
+                        alt={currentPair?.base} 
+                        className="w-4 h-4 rounded-full" 
+                      />
                     <span className="text-gray-500 text-sm">
                       {currentPair?.base}
                     </span>
+                    </div>
                   }
                 />
               </div>
 
               {/* Total */}
               <div className="mb-6 p-3 bg-gray-50 rounded-xl border border-gray-200">
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-600">Total</span>
+                  <div className="flex items-center gap-1">
                   <span className="text-gray-900 font-mono">
                     {orderSize && orderPrice
                       ? (parseFloat(orderSize) * parseFloat(orderPrice)).toFixed(2)
-                      : "0.00"}{" "}
+                        : "0.00"}
+                    </span>
+                    <img 
+                      src={currentPair?.quote === "USDC" ? "/assets/usdc.png" : "/assets/usdt_logo.png"} 
+                      alt={currentPair?.quote} 
+                      className="w-4 h-4 rounded-full" 
+                    />
+                    <span className="text-gray-900 font-mono">
                     {currentPair?.quote}
                   </span>
+                  </div>
                 </div>
               </div>
 
@@ -587,7 +653,10 @@ export default function DarkPoolPage() {
 
               {/* Place Order Button */}
               {!connected ? (
-                <WalletMultiButton className="!w-full !bg-primary !rounded-xl !h-12 !justify-center" />
+                <WalletMultiButton 
+                  className="!w-full !bg-[#0d08e3] !rounded-xl !h-12 !justify-center hover:!bg-[#0e0dc6] !text-white" 
+                  style={{ backgroundColor: '#0d08e3' }}
+                />
               ) : (
                 <Button
                   color={orderSide === "buy" ? "primary" : "danger"}
